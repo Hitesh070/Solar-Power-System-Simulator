@@ -53,7 +53,27 @@ export function computeSimulationMetrics(
 
   const totalHours = hourly.length;
   const isFullYear = totalHours >= 8760;
-  const yearScalingFactor = isFullYear ? 1 : (8760 / Math.max(1, totalHours));
+
+  // Track sample statistics
+  const sampleDays = Math.max(1, totalHours / 24);
+  const totalSampleSolarKwh = hourly.reduce((sum, rec) => sum + rec.solarAcPowerKw, 0);
+  const totalSampleDirectUsedKwh = hourly.reduce((sum, rec) => sum + rec.directSolarUsedKw, 0);
+  const totalSampleBatteryDischargeKwh = hourly.reduce((sum, rec) => sum + rec.batteryDischargeKw, 0);
+  const avgSamplePoa = totalHours > 0 ? hourly.reduce((sum, rec) => sum + rec.poaIrradianceW, 0) / totalHours : 0;
+
+  const avgDailySolarKwh = totalSampleSolarKwh / sampleDays;
+  const sampleSelfConsumptionKwh = totalSampleDirectUsedKwh + totalSampleBatteryDischargeKwh;
+  const selfConsumptionRatio = totalSampleSolarKwh > 0
+    ? Math.min(1.0, Math.max(0.2, sampleSelfConsumptionKwh / totalSampleSolarKwh))
+    : 0.8;
+
+  // Annualized base solar generation for Indian climate (approx 365.25 days)
+  const annualBaseSolarKwh = avgDailySolarKwh * 365.25;
+
+  // Typical Indian insolation distribution across 12 calendar months:
+  // March-May is peak summer (10.5-11.5%), July-August is monsoon cloud cover dip (6.5%), Nov-Feb is crisp clear winter sun (7.5-8.5%)
+  const monthWeights = [0.075, 0.085, 0.105, 0.115, 0.11, 0.08, 0.065, 0.065, 0.08, 0.09, 0.085, 0.08];
+  const daysInMonths = [31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
   hourly.forEach((rec) => {
     const bucket = monthlyMap.get(rec.month);
@@ -72,25 +92,32 @@ export function computeSimulationMetrics(
 
   for (let m = 1; m <= 12; m++) {
     const b = monthlyMap.get(m)!;
-    // Typical Indian insolation distribution across 12 months:
-    // March-May is peak summer, July-August is monsoon dip, Nov-Feb is crisp winter sun
-    const monthWeight = [0.075, 0.085, 0.105, 0.115, 0.11, 0.08, 0.065, 0.065, 0.08, 0.09, 0.085, 0.08][m - 1];
-    
+    const monthWeight = monthWeights[m - 1];
+    const monthDays = daysInMonths[m - 1];
+
     const solarYield = isFullYear
       ? b.solarYieldKwh
-      : (b.solarYieldKwh > 0 ? b.solarYieldKwh * yearScalingFactor * monthWeight : 0);
+      : (annualBaseSolarKwh * monthWeight);
+
     const load = isFullYear
       ? b.loadKwh
-      : (config.dailyConsumptionKwh * 30.4);
-    const gridImport = isFullYear
-      ? b.gridImportKwh
-      : Math.max(0, load - solarYield * 0.75);
-    const gridExport = isFullYear
-      ? b.gridExportKwh
-      : Math.max(0, solarYield * 0.25);
+      : (config.dailyConsumptionKwh * monthDays);
+
     const selfConsumption = isFullYear
       ? b.selfConsumptionKwh
-      : Math.min(solarYield, load);
+      : Math.min(load, solarYield * selfConsumptionRatio);
+
+    const gridExport = isFullYear
+      ? b.gridExportKwh
+      : Math.max(0, solarYield - selfConsumption);
+
+    const gridImport = isFullYear
+      ? b.gridImportKwh
+      : Math.max(0, load - selfConsumption);
+
+    const avgPoa = isFullYear && b.hoursCount > 0
+      ? Math.round(b.poaSum / b.hoursCount)
+      : Math.round(avgSamplePoa * (monthWeight / (1 / 12)));
 
     monthly.push({
       month: m,
@@ -100,7 +127,7 @@ export function computeSimulationMetrics(
       gridImportKwh: Math.round(gridImport),
       gridExportKwh: Math.round(gridExport),
       selfConsumptionKwh: Math.round(selfConsumption),
-      averagePoaW: b.hoursCount > 0 ? Math.round(b.poaSum / b.hoursCount) : 0,
+      averagePoaW: Math.round(avgPoa),
     });
   }
 

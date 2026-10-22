@@ -91,4 +91,34 @@ if (diff < 0.05) {
   console.error(`❌ TEST 5 FAILED: mismatch ${diff}`);
 }
 
+// Test 6: 12-Month Annualization & Positive ROI Verification
+import { computeSimulationMetrics } from '../lib/financial-engine';
+const mockHourlyResults = Array.from({ length: 240 }, (_, i) => ({
+  datetime: `2026-10-${String(Math.floor(i / 24) + 1).padStart(2, '0')}T${String(i % 24).padStart(2, '0')}:00:00Z`,
+  hour: i % 24,
+  month: 10,
+  solarZenithDeg: 45,
+  solarElevationDeg: 45,
+  solarAzimuthDeg: 180,
+  poaIrradianceW: i % 24 >= 6 && i % 24 <= 18 ? 650 : 0,
+  cellTempC: 35,
+  solarDcPowerKw: i % 24 >= 6 && i % 24 <= 18 ? 2.5 : 0,
+  solarAcPowerKw: i % 24 >= 6 && i % 24 <= 18 ? 2.4 : 0,
+  loadKw: 0.8,
+  directSolarUsedKw: i % 24 >= 6 && i % 24 <= 18 ? 0.8 : 0,
+  batteryChargeKw: 0,
+  batteryDischargeKw: 0,
+  batterySocPercent: 0,
+  gridExportKw: i % 24 >= 6 && i % 24 <= 18 ? 1.6 : 0,
+  gridImportKw: i % 24 >= 6 && i % 24 <= 18 ? 0 : 0.8,
+}));
+
+const metrics = computeSimulationMetrics(mockHourlyResults, testConfig);
+console.log(`[TEST 6] Annual Gen: ${metrics.financials.annualGenerationKwh} kWh, 25-Yr Net Profit: ₹${metrics.financials.twentyFiveYearSavingsInr.toLocaleString('en-IN')}, Payback: ${metrics.financials.paybackPeriodYears} yrs`);
+if (metrics.financials.twentyFiveYearSavingsInr > 0 && metrics.financials.paybackPeriodYears < 10) {
+  console.log('✅ TEST 6 PASSED: Positive ROI and realistic payback verified');
+} else {
+  console.error('❌ TEST 6 FAILED: ROI must be positive');
+}
+
 console.log('--- ALL PHYSICS TESTS COMPLETE & PASSED ---');

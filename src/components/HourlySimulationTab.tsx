@@ -53,7 +53,7 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
             max={totalDays - 1}
             value={selectedDayIndex}
             onChange={(e) => setSelectedDayIndex(parseInt(e.target.value))}
-            className="w-32 accent-slate-900 cursor-pointer h-1.5 bg-slate-200 rounded"
+            className="w-32 accent-blue-600 cursor-pointer h-1.5 bg-slate-200 rounded"
           />
           <span className="text-xs font-mono font-bold text-slate-900 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">
             {currentDayHours[0]?.datetime.split('T')[0] || `Day ${selectedDayIndex + 1}`}

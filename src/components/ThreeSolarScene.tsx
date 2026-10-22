@@ -370,7 +370,7 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
             onClick={() => setIsPlaying(!isPlaying)}
             className={`p-2.5 rounded-xl border transition-all ${
               isPlaying
-                ? 'bg-slate-900 border-black text-white shadow-sm'
+                ? 'bg-blue-600 border-blue-700 text-white shadow-sm'
                 : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-700'
             }`}
             title={isPlaying ? 'Pause' : 'Play 24h Cycle'}
@@ -381,9 +381,9 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
           <div className="flex-1 flex flex-col gap-1">
             <div className="flex justify-between items-center text-xs">
               <span className="text-slate-600 font-medium flex items-center gap-1.5">
-                <Sun className="w-3.5 h-3.5 text-slate-900" /> Time of Day
+                <Sun className="w-3.5 h-3.5 text-blue-600" /> Time of Day
               </span>
-              <span className="font-mono font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+              <span className="font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
                 {String(Math.floor(selectedHour)).padStart(2, '0')}:
                 {String(Math.floor((selectedHour % 1) * 60)).padStart(2, '0')}
               </span>
@@ -398,7 +398,7 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
                 setSelectedHour(parseFloat(e.target.value));
                 if (isPlaying) setIsPlaying(false);
               }}
-              className="w-full accent-slate-900 cursor-pointer h-1.5 bg-slate-200 rounded appearance-none"
+              className="w-full accent-blue-600 cursor-pointer h-1.5 bg-slate-200 rounded appearance-none"
             />
           </div>
         </div>

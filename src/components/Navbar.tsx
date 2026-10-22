@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sun, Download, BookOpen, Layers, RefreshCw, MapPin } from 'lucide-react';
+import { Sun, Download, BookOpen, Layers, RefreshCw, MapPin, Zap } from 'lucide-react';
 import { PRESETS, SystemPreset } from '../lib/mock-presets';
 import { CompleteSimulationResults } from '../types/solar';
 
@@ -41,13 +41,14 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 lg:px-8 py-3 flex items-center justify-between gap-4 shadow-sm">
       {/* Brand & Logo */}
       <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center text-white font-bold shadow-sm">
+        <div className="w-9 h-9 rounded-xl bg-amber-500 flex items-center justify-center text-white font-bold shadow-sm">
           <Sun className="w-5 h-5 fill-current" />
         </div>
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-base font-bold tracking-tight text-slate-900 flex items-center gap-1">
-              HI Grid
+            <h1 className="text-base font-bold tracking-tight text-slate-900 flex items-center gap-1.5">
+              <span>HI Grid</span>
+              <Zap className="w-4 h-4 text-amber-500 fill-amber-500" />
             </h1>
           </div>
           <p className="text-[11px] text-slate-500 hidden sm:block">
@@ -67,7 +68,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               if (selected) onSelectPreset(selected);
             }}
             defaultValue=""
-            className="bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs text-slate-700 rounded-xl px-3 py-1.5 font-medium focus:outline-none focus:border-slate-900 transition cursor-pointer"
+            className="bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs text-slate-700 rounded-xl px-3 py-1.5 font-medium focus:outline-none focus:border-blue-600 transition cursor-pointer"
           >
             <option value="" disabled>
               Load Benchmark Preset...
@@ -86,7 +87,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           className="flex items-center gap-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 px-3 py-1.5 rounded-xl text-xs font-semibold transition"
           title="Pick Location on Interactive Map"
         >
-          <MapPin className="w-3.5 h-3.5 text-slate-700" />
+          <MapPin className="w-3.5 h-3.5 text-blue-600" />
           <span className="hidden sm:inline">Map</span>
         </button>
 
@@ -115,7 +116,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <button
           onClick={onRefresh}
           disabled={isLoading}
-          className="flex items-center gap-1.5 bg-slate-900 hover:bg-black text-white font-bold px-3.5 py-1.5 rounded-xl text-xs transition shadow-sm active:scale-95 disabled:opacity-50"
+          className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold px-3.5 py-1.5 rounded-xl text-xs transition shadow-sm active:scale-95 disabled:opacity-50"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
           <span>{isLoading ? 'Simulating...' : 'Run Simulation'}</span>

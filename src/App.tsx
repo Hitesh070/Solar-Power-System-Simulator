@@ -10,6 +10,7 @@ import {
   Sun,
   AlertCircle,
   MapPin,
+  Zap,
 } from 'lucide-react';
 import { LocationData, PVSystemConfig, CompleteSimulationResults } from './types/solar';
 import { PRESETS, SystemPreset } from './lib/mock-presets';
@@ -198,7 +199,7 @@ export function App() {
                 <div className="flex flex-col gap-3">
                   <div className="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-sm">
                     <span className="flex items-center gap-1.5 font-medium">
-                      <MapPin className="w-3.5 h-3.5 text-slate-700" />
+                      <MapPin className="w-3.5 h-3.5 text-blue-600" />
                       Flat Concrete Terrace Rooftop Simulation for {location.name}
                     </span>
                     <span className="font-mono text-slate-800 font-bold text-[11px] bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
@@ -225,7 +226,7 @@ export function App() {
             </div>
           ) : (
             <div className="bg-white border border-slate-200 rounded-2xl p-16 flex flex-col items-center justify-center text-center shadow-sm">
-              <Sun className="w-10 h-10 text-slate-900 animate-spin mb-3" />
+              <Sun className="w-10 h-10 text-amber-500 animate-spin mb-3" />
               <h3 className="text-sm font-bold text-slate-900">Running Solar Physics Model...</h3>
               <p className="text-xs text-slate-500 mt-1 max-w-md">
                 Computing astronomical solar positions, Hay-Davies plane of array transposition, and financial calculations.
@@ -252,8 +253,13 @@ export function App() {
       {/* Footer */}
       <footer className="mt-auto border-t border-slate-200 bg-white px-6 py-3.5 text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <Sun className="w-3.5 h-3.5 text-slate-700" />
-          <span>HI Grid • Solar Power System Simulator</span>
+          <Sun className="w-3.5 h-3.5 text-amber-500" />
+          <span className="flex items-center gap-1 font-semibold text-slate-800">
+            <span>HI Grid</span>
+            <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+          </span>
+          <span>•</span>
+          <span>Solar Power System Simulator</span>
           <span>•</span>
           <span>Open-Meteo & NREL Reference Models</span>
         </div>

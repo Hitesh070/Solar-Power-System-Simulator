@@ -60,9 +60,9 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
       <div>
         <div className="flex items-center justify-between mb-2">
           <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-            <MapPin className="w-3.5 h-3.5 text-slate-900" /> Geographic Location
+            <MapPin className="w-3.5 h-3.5 text-blue-600" /> Geographic Location
           </label>
-          <span className="text-[11px] font-mono text-slate-900 font-semibold">
+          <span className="text-[11px] font-mono text-blue-700 font-semibold">
             {location.latitude.toFixed(2)}°, {location.longitude.toFixed(2)}°
           </span>
         </div>
@@ -76,7 +76,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
               placeholder="Search city, address..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 focus:border-slate-900 text-xs text-slate-900 pl-8 pr-3 py-2 rounded-xl focus:outline-none transition focus:bg-white"
+              className="w-full bg-slate-50 border border-slate-200 focus:border-blue-600 text-xs text-slate-900 pl-8 pr-3 py-2 rounded-xl focus:outline-none transition focus:bg-white"
             />
           </div>
           <button
@@ -89,7 +89,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
           <button
             type="button"
             onClick={onOpenMap}
-            className="bg-slate-900 hover:bg-black text-white px-3 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shrink-0 shadow-sm"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shrink-0 shadow-sm"
             title="Open Interactive Map to pinpoint exact location"
           >
             <Map className="w-3.5 h-3.5 text-white" />
@@ -108,7 +108,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                 className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-900 border-b border-slate-100 last:border-b-0 transition flex items-center justify-between"
               >
                 <span className="truncate pr-2">{item.displayName}</span>
-                <Check className="w-3 h-3 text-slate-900 shrink-0" />
+                <Check className="w-3 h-3 text-blue-600 shrink-0" />
               </button>
             ))}
           </div>
@@ -119,7 +119,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
           <span className="font-semibold text-slate-900 truncate">{location.name}</span>
           <button
             onClick={onOpenMap}
-            className="text-[11px] text-slate-900 hover:underline font-semibold shrink-0 ml-2"
+            className="text-[11px] text-blue-600 hover:underline font-semibold shrink-0 ml-2"
           >
             Change
           </button>
@@ -164,7 +164,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                 onChange={(e) =>
                   onUpdateConfig({ systemCapacityKw: parseFloat(e.target.value) })
                 }
-                className="w-full accent-slate-900 cursor-pointer h-1.5 bg-slate-200 rounded appearance-none"
+                className="w-full accent-blue-600 cursor-pointer h-1.5 bg-slate-200 rounded appearance-none"
               />
             </div>
 
@@ -185,7 +185,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                 onChange={(e) =>
                   onUpdateConfig({ panelTiltDeg: parseInt(e.target.value) })
                 }
-                className="w-full accent-slate-900 cursor-pointer h-1.5 bg-slate-200 rounded appearance-none"
+                className="w-full accent-blue-600 cursor-pointer h-1.5 bg-slate-200 rounded appearance-none"
               />
             </div>
 
@@ -206,7 +206,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                 onChange={(e) =>
                   onUpdateConfig({ panelAzimuthDeg: parseInt(e.target.value) })
                 }
-                className="w-full accent-slate-900 cursor-pointer h-1.5 bg-slate-200 rounded appearance-none"
+                className="w-full accent-blue-600 cursor-pointer h-1.5 bg-slate-200 rounded appearance-none"
               />
             </div>
 
@@ -276,7 +276,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                 type="checkbox"
                 checked={config.hasBattery}
                 onChange={(e) => onUpdateConfig({ hasBattery: e.target.checked })}
-                className="w-4 h-4 accent-slate-900 rounded"
+                className="w-4 h-4 accent-blue-600 rounded"
               />
               <span className="text-xs text-slate-800 font-medium">
                 Include Battery Storage Bank
@@ -301,7 +301,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                     onChange={(e) =>
                       onUpdateConfig({ batteryCapacityKwh: parseFloat(e.target.value) })
                     }
-                    className="w-full accent-slate-900 cursor-pointer h-1.5 bg-slate-200 rounded appearance-none"
+                    className="w-full accent-blue-600 cursor-pointer h-1.5 bg-slate-200 rounded appearance-none"
                   />
                 </div>
 
@@ -383,7 +383,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                 onChange={(e) =>
                   onUpdateConfig({ dailyConsumptionKwh: parseFloat(e.target.value) })
                 }
-                className="w-full accent-slate-900 cursor-pointer h-1.5 bg-slate-200 rounded appearance-none"
+                className="w-full accent-blue-600 cursor-pointer h-1.5 bg-slate-200 rounded appearance-none"
               />
               <span className="text-[10px] text-slate-400 block mt-0.5">
                 ~{Math.round(config.dailyConsumptionKwh * 30)} units / month
