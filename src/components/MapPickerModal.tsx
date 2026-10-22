@@ -178,7 +178,7 @@ export const MapPickerModal: React.FC<MapPickerModalProps> = ({
         {/* Header */}
         <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-amber-50 text-amber-600 rounded-xl border border-amber-200">
+            <div className="p-2 bg-slate-100 text-slate-900 rounded-xl border border-slate-200">
               <MapPin className="w-5 h-5" />
             </div>
             <div>
@@ -206,13 +206,13 @@ export const MapPickerModal: React.FC<MapPickerModalProps> = ({
                 placeholder="Search city, address, or locality anywhere in the world..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 focus:border-amber-500 text-xs text-slate-900 pl-10 pr-3 py-2.5 rounded-xl focus:outline-none transition focus:bg-white"
+                className="w-full bg-slate-50 border border-slate-200 focus:border-slate-900 text-xs text-slate-900 pl-10 pr-3 py-2.5 rounded-xl focus:outline-none transition focus:bg-white"
               />
             </div>
             <button
               type="submit"
               disabled={isLoading}
-              className="bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition flex items-center gap-1.5 shadow-sm"
+              className="bg-slate-900 hover:bg-black text-white font-bold px-4 py-2.5 rounded-xl text-xs transition flex items-center gap-1.5 shadow-sm"
             >
               {isLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Search'}
             </button>
@@ -229,7 +229,7 @@ export const MapPickerModal: React.FC<MapPickerModalProps> = ({
                   className="w-full text-left px-3.5 py-2.5 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-900 border-b border-slate-100 last:border-b-0 transition flex items-center justify-between"
                 >
                   <span className="truncate pr-2">{item.display_name}</span>
-                  <Crosshair className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                  <Crosshair className="w-3.5 h-3.5 text-slate-900 shrink-0" />
                 </button>
               ))}
             </div>
@@ -257,7 +257,7 @@ export const MapPickerModal: React.FC<MapPickerModalProps> = ({
               </span>
             </div>
             <div className="h-6 w-px bg-slate-200 hidden sm:block" />
-            <div className="text-xs font-mono font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">
+            <div className="text-xs font-mono font-bold text-slate-900 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">
               {currentLat.toFixed(4)}°, {currentLon.toFixed(4)}°
             </div>
           </div>
@@ -271,7 +271,7 @@ export const MapPickerModal: React.FC<MapPickerModalProps> = ({
             </button>
             <button
               onClick={handleConfirm}
-              className="px-5 py-2 text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-xl transition flex items-center gap-1.5 shadow-sm"
+              className="px-5 py-2 text-xs font-bold text-white bg-slate-900 hover:bg-black rounded-xl transition flex items-center gap-1.5 shadow-sm"
             >
               <Check className="w-4 h-4" />
               <span>Confirm Location</span>

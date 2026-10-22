@@ -25,12 +25,12 @@ export const MonthlyYieldTab: React.FC<MonthlyYieldTabProps> = ({ results }) => 
         <div className="bg-white border border-slate-200 rounded-xl p-4 flex items-center justify-between shadow-sm">
           <div>
             <span className="text-xs text-slate-500 font-medium">Peak Solar Month</span>
-            <div className="text-xl font-bold text-amber-600 mt-0.5 font-mono">
+            <div className="text-xl font-bold text-slate-900 mt-0.5 font-mono">
               {bestMonth.monthName} ({bestMonth.solarYieldKwh.toLocaleString('en-IN')} units)
             </div>
             <span className="text-[11px] text-slate-400">Highest daily solar insolation</span>
           </div>
-          <div className="p-2.5 bg-amber-50 text-amber-600 rounded-xl border border-amber-200">
+          <div className="p-2.5 bg-slate-100 text-slate-900 rounded-xl border border-slate-200">
             <ArrowUp className="w-5 h-5" />
           </div>
         </div>
@@ -69,7 +69,7 @@ export const MonthlyYieldTab: React.FC<MonthlyYieldTabProps> = ({ results }) => 
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
           <div>
             <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-              <BarChart3 className="w-4 h-4 text-amber-500" /> 12-Month Generation vs Consumption
+              <BarChart3 className="w-4 h-4 text-slate-900" /> 12-Month Generation vs Consumption
             </h3>
             <p className="text-xs text-slate-500">
               Evaluates seasonal surplus and deficit months across the calendar year.
@@ -78,7 +78,7 @@ export const MonthlyYieldTab: React.FC<MonthlyYieldTabProps> = ({ results }) => 
 
           <div className="flex items-center gap-4 text-xs font-medium">
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-sm bg-amber-500" />
+              <span className="w-2.5 h-2.5 rounded-sm bg-slate-900" />
               <span className="text-slate-700">Solar Yield (kWh)</span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -99,7 +99,7 @@ export const MonthlyYieldTab: React.FC<MonthlyYieldTabProps> = ({ results }) => 
               return (
                 <div key={m.month} className="flex-1 flex flex-col items-center h-full justify-end group">
                   <div className="opacity-0 group-hover:opacity-100 transition pointer-events-none mb-2 text-center">
-                    <span className="text-[10px] font-mono text-amber-600 block font-bold">
+                    <span className="text-[10px] font-mono text-slate-900 block font-bold">
                       {m.solarYieldKwh}
                     </span>
                     <span className="text-[10px] font-mono text-purple-600 block">
@@ -110,7 +110,7 @@ export const MonthlyYieldTab: React.FC<MonthlyYieldTabProps> = ({ results }) => 
                   <div className="w-full flex items-end justify-center gap-1 h-44">
                     <div
                       style={{ height: `${solarHeightPct}%` }}
-                      className="w-1/2 max-w-[20px] bg-amber-500 rounded-t transition-all duration-500 hover:brightness-105"
+                      className="w-1/2 max-w-[20px] bg-slate-900 rounded-t transition-all duration-500 hover:bg-black"
                     />
                     <div
                       style={{ height: `${loadHeightPct}%` }}
@@ -164,7 +164,7 @@ export const MonthlyYieldTab: React.FC<MonthlyYieldTabProps> = ({ results }) => 
                 return (
                   <tr key={m.month} className="hover:bg-slate-50/80 transition">
                     <td className="px-4 py-3 font-sans font-semibold text-slate-900">{m.monthName}</td>
-                    <td className="px-4 py-3 text-right text-amber-600 font-bold">
+                    <td className="px-4 py-3 text-right text-slate-900 font-bold">
                       {m.solarYieldKwh.toLocaleString('en-IN')}
                     </td>
                     <td className="px-4 py-3 text-right text-purple-700">

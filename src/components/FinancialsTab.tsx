@@ -32,7 +32,7 @@ export const FinancialsTab: React.FC<FinancialsTabProps> = ({ results }) => {
           <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block mb-1">
             Payback Period
           </span>
-          <div className="text-3xl font-bold text-amber-600 font-mono">
+          <div className="text-3xl font-bold text-slate-900 font-mono">
             {financials.paybackPeriodYears > 25 ? '> 25' : financials.paybackPeriodYears}{' '}
             <span className="text-sm font-sans text-slate-500 font-normal">Years</span>
           </div>
@@ -195,7 +195,7 @@ export const FinancialsTab: React.FC<FinancialsTabProps> = ({ results }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
           <h4 className="text-xs font-bold text-slate-900 mb-4 uppercase tracking-wider flex items-center gap-2">
-            <PiggyBank className="w-4 h-4 text-amber-500" /> Capital & Lifecycle Cost Breakdown
+            <PiggyBank className="w-4 h-4 text-slate-900" /> Capital & Lifecycle Cost Breakdown
           </h4>
           <div className="space-y-3 text-xs">
             <div className="flex justify-between py-2 border-b border-slate-100">
@@ -222,7 +222,7 @@ export const FinancialsTab: React.FC<FinancialsTabProps> = ({ results }) => {
             </div>
             <div className="flex justify-between py-2">
               <span className="text-slate-600">Inverter Replacement (Year 12):</span>
-              <span className="font-mono text-amber-700 font-semibold">{formatINR(Math.round(config.inverterCapacityKw * 10000))}</span>
+              <span className="font-mono text-slate-900 font-semibold">{formatINR(Math.round(config.inverterCapacityKw * 10000))}</span>
             </div>
           </div>
         </div>
@@ -233,23 +233,23 @@ export const FinancialsTab: React.FC<FinancialsTabProps> = ({ results }) => {
           </h4>
           <ul className="space-y-2.5 text-xs text-slate-600">
             <li className="flex items-start gap-2">
-              <span className="text-amber-500 font-bold">•</span>
+              <span className="text-slate-900 font-bold">•</span>
               <span><strong>Module Degradation:</strong> 0.5% per annum standard warranty performance decay.</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-amber-500 font-bold">•</span>
+              <span className="text-slate-900 font-bold">•</span>
               <span><strong>Utility Tariff Escalation:</strong> 3.5% compounding annual grid price inflation.</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-amber-500 font-bold">•</span>
+              <span className="text-slate-900 font-bold">•</span>
               <span><strong>Discount Rate:</strong> 6.0% real rate for Levelized Cost of Energy (LCOE) discounting.</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-amber-500 font-bold">•</span>
+              <span className="text-slate-900 font-bold">•</span>
               <span><strong>Net Metering / Export Credit:</strong> Credited at ₹{config.feedInTariffInr.toFixed(2)}/unit.</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-amber-500 font-bold">•</span>
+              <span className="text-slate-900 font-bold">•</span>
               <span><strong>Carbon Avoidance:</strong> 0.71 kg CO₂/kWh grid intensity factor.</span>
             </li>
           </ul>

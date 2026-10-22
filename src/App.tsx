@@ -80,7 +80,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-amber-500 selection:text-white">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-slate-900 selection:text-white">
       {/* Top Navigation Bar */}
       <Navbar
         onSelectPreset={handleSelectPreset}
@@ -112,7 +112,7 @@ export function App() {
               onClick={() => setActiveTab('overview')}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap ${
                 activeTab === 'overview'
-                  ? 'bg-amber-500 text-white font-bold shadow-sm'
+                  ? 'bg-slate-900 text-white font-bold shadow-sm'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
@@ -124,7 +124,7 @@ export function App() {
               onClick={() => setActiveTab('3d')}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap ${
                 activeTab === '3d'
-                  ? 'bg-amber-500 text-white font-bold shadow-sm'
+                  ? 'bg-slate-900 text-white font-bold shadow-sm'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
@@ -136,7 +136,7 @@ export function App() {
               onClick={() => setActiveTab('hourly')}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap ${
                 activeTab === 'hourly'
-                  ? 'bg-amber-500 text-white font-bold shadow-sm'
+                  ? 'bg-slate-900 text-white font-bold shadow-sm'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
@@ -148,7 +148,7 @@ export function App() {
               onClick={() => setActiveTab('monthly')}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap ${
                 activeTab === 'monthly'
-                  ? 'bg-amber-500 text-white font-bold shadow-sm'
+                  ? 'bg-slate-900 text-white font-bold shadow-sm'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
@@ -160,7 +160,7 @@ export function App() {
               onClick={() => setActiveTab('financials')}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap ${
                 activeTab === 'financials'
-                  ? 'bg-amber-500 text-white font-bold shadow-sm'
+                  ? 'bg-slate-900 text-white font-bold shadow-sm'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
@@ -172,7 +172,7 @@ export function App() {
               onClick={() => setActiveTab('specs')}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap ${
                 activeTab === 'specs'
-                  ? 'bg-amber-500 text-white font-bold shadow-sm'
+                  ? 'bg-slate-900 text-white font-bold shadow-sm'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
@@ -198,10 +198,10 @@ export function App() {
                 <div className="flex flex-col gap-3">
                   <div className="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-sm">
                     <span className="flex items-center gap-1.5 font-medium">
-                      <MapPin className="w-3.5 h-3.5 text-amber-500" />
+                      <MapPin className="w-3.5 h-3.5 text-slate-700" />
                       Flat Concrete Terrace Rooftop Simulation for {location.name}
                     </span>
-                    <span className="font-mono text-amber-700 font-bold text-[11px] bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                    <span className="font-mono text-slate-800 font-bold text-[11px] bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
                       Tilt: {config.panelTiltDeg}° | Facing: True South ({config.panelAzimuthDeg}°)
                     </span>
                   </div>
@@ -225,7 +225,7 @@ export function App() {
             </div>
           ) : (
             <div className="bg-white border border-slate-200 rounded-2xl p-16 flex flex-col items-center justify-center text-center shadow-sm">
-              <Sun className="w-10 h-10 text-amber-500 animate-spin mb-3" />
+              <Sun className="w-10 h-10 text-slate-900 animate-spin mb-3" />
               <h3 className="text-sm font-bold text-slate-900">Running Solar Physics Model...</h3>
               <p className="text-xs text-slate-500 mt-1 max-w-md">
                 Computing astronomical solar positions, Hay-Davies plane of array transposition, and financial calculations.
@@ -252,8 +252,8 @@ export function App() {
       {/* Footer */}
       <footer className="mt-auto border-t border-slate-200 bg-white px-6 py-3.5 text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <Sun className="w-3.5 h-3.5 text-amber-500" />
-          <span>HeliosPV • Solar Power System Simulator</span>
+          <Sun className="w-3.5 h-3.5 text-slate-700" />
+          <span>HI Grid • Solar Power System Simulator</span>
           <span>•</span>
           <span>Open-Meteo & NREL Reference Models</span>
         </div>

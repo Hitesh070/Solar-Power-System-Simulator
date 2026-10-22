@@ -31,7 +31,7 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
       {/* Day Selector Header */}
       <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-amber-50 text-amber-600 rounded-xl border border-amber-200">
+          <div className="p-2 bg-slate-100 text-slate-900 rounded-xl border border-slate-200">
             <Clock className="w-5 h-5" />
           </div>
           <div>
@@ -53,9 +53,9 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
             max={totalDays - 1}
             value={selectedDayIndex}
             onChange={(e) => setSelectedDayIndex(parseInt(e.target.value))}
-            className="w-32 accent-amber-500 cursor-pointer h-1.5 bg-slate-200 rounded"
+            className="w-32 accent-slate-900 cursor-pointer h-1.5 bg-slate-200 rounded"
           />
-          <span className="text-xs font-mono font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">
+          <span className="text-xs font-mono font-bold text-slate-900 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">
             {currentDayHours[0]?.datetime.split('T')[0] || `Day ${selectedDayIndex + 1}`}
           </span>
         </div>
@@ -66,7 +66,7 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-3">
           <div className="flex items-center gap-4 text-xs font-medium">
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+              <span className="w-2.5 h-2.5 rounded-full bg-slate-900" />
               <span className="text-slate-700">Solar AC (kW)</span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -88,7 +88,7 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
           {activeHourData && (
             <div className="text-xs bg-slate-50 px-3 py-1 rounded-xl border border-slate-200 flex items-center gap-2">
               <span className="text-slate-500">Hour {activeHourData.hour}:00</span>
-              <span className="text-amber-700 font-mono font-bold">
+              <span className="text-slate-900 font-mono font-bold">
                 PV: {activeHourData.solarAcPowerKw} kW
               </span>
               <span className="text-purple-700 font-mono font-bold">
@@ -152,12 +152,12 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
                 <g>
                   <defs>
                     <linearGradient id="solarGradientLight" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.3" />
-                      <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.0" />
+                      <stop offset="0%" stopColor="#0f172a" stopOpacity="0.25" />
+                      <stop offset="100%" stopColor="#0f172a" stopOpacity="0.0" />
                     </linearGradient>
                   </defs>
                   <path d={areaPath} fill="url(#solarGradientLight)" />
-                  <path d={linePath} fill="none" stroke="#f59e0b" strokeWidth="2.5" />
+                  <path d={linePath} fill="none" stroke="#0f172a" strokeWidth="2.5" />
                 </g>
               );
             })()}
@@ -205,7 +205,7 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
                 y1="30"
                 x2={50 + (hoveredHour / 23) * 720}
                 y2="220"
-                stroke="#f59e0b"
+                stroke="#0f172a"
                 strokeWidth="1.5"
                 strokeDasharray="2 2"
               />
@@ -252,7 +252,7 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
           <div className="text-xs text-slate-500 mb-1">POA Irradiance:</div>
-          <div className="text-xl font-bold font-mono text-amber-600">
+          <div className="text-xl font-bold font-mono text-slate-900">
             {activeHourData.poaIrradianceW} W/m²
           </div>
           <div className="text-[11px] text-slate-400 mt-1">

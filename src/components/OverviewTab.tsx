@@ -61,14 +61,14 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ results }) => {
         <div className="bg-white border border-slate-200 hover:border-slate-300 rounded-xl p-4 transition shadow-sm flex flex-col justify-between">
           <div className="flex items-center justify-between text-slate-500 mb-2">
             <span className="text-[11px] font-semibold uppercase tracking-wider">Annual Yield</span>
-            <Sun className="w-4 h-4 text-amber-500" />
+            <Sun className="w-4 h-4 text-slate-900" />
           </div>
           <div>
             <div className="text-2xl font-bold text-slate-900 tracking-tight font-mono">
               {financials.annualGenerationKwh.toLocaleString('en-IN')}
               <span className="text-xs font-normal text-slate-500 font-sans ml-1">kWh</span>
             </div>
-            <div className="text-[11px] text-amber-700 font-mono font-medium mt-0.5">
+            <div className="text-[11px] text-slate-700 font-mono font-medium mt-0.5">
               {specificYield} units/kWp/yr
             </div>
           </div>
@@ -127,13 +127,13 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ results }) => {
         <div className="bg-white border border-slate-200 hover:border-slate-300 rounded-xl p-4 transition shadow-sm flex flex-col justify-between">
           <div className="flex items-center justify-between text-slate-500 mb-2">
             <span className="text-[11px] font-semibold uppercase tracking-wider">25-Yr Return</span>
-            <Zap className="w-4 h-4 text-amber-500" />
+            <Zap className="w-4 h-4 text-slate-900" />
           </div>
           <div>
             <div className="text-2xl font-bold text-slate-900 tracking-tight font-mono">
               {formatINR(financials.twentyFiveYearSavingsInr)}
             </div>
-            <div className="text-[11px] text-amber-700 font-mono font-medium mt-0.5">
+            <div className="text-[11px] text-slate-700 font-mono font-medium mt-0.5">
               ROI: {config.systemCostInr > 0 ? `${Math.round((financials.twentyFiveYearSavingsInr / config.systemCostInr) * 100)}%` : 'N/A'}
             </div>
           </div>
@@ -160,17 +160,17 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ results }) => {
       {/* Energy Flow & Dispatch Balance */}
       <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
         <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-5 flex items-center gap-2">
-          <Zap className="w-4 h-4 text-amber-500" /> Energy Flow & Dispatch Architecture
+          <Zap className="w-4 h-4 text-slate-900" /> Energy Flow & Dispatch Architecture
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-center">
           {/* Generation Block */}
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 flex flex-col gap-2">
             <div className="flex items-center justify-between text-xs text-slate-500">
-              <span className="font-semibold uppercase tracking-wider text-amber-700">
+              <span className="font-semibold uppercase tracking-wider text-slate-900">
                 1. Solar PV Generation
               </span>
-              <Sun className="w-4 h-4 text-amber-500" />
+              <Sun className="w-4 h-4 text-slate-900" />
             </div>
             <div className="text-2xl font-bold text-slate-900 font-mono">
               {financials.annualGenerationKwh.toLocaleString('en-IN')}

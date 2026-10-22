@@ -22,13 +22,13 @@ export const EducationModal: React.FC<EducationModalProps> = ({ isOpen, onClose 
 
         {/* Modal Header */}
         <div className="flex items-center gap-3 mb-6">
-          <div className="p-3 bg-amber-50 text-amber-600 border border-amber-200 rounded-2xl">
+          <div className="p-3 bg-slate-100 text-slate-900 border border-slate-200 rounded-2xl">
             <BookOpen className="w-6 h-6" />
           </div>
           <div>
             <h2 className="text-xl font-bold text-slate-900">Photovoltaic Physics & Computational Principles</h2>
             <p className="text-xs text-slate-500">
-              Understanding the mathematics, transposition models, and thermodynamics powering HeliosPV.
+              Understanding the mathematics, transposition models, and thermodynamics powering HI Grid.
             </p>
           </div>
         </div>
@@ -37,8 +37,8 @@ export const EducationModal: React.FC<EducationModalProps> = ({ isOpen, onClose 
         <div className="space-y-5 text-xs text-slate-600 leading-relaxed">
           {/* Section 1: Solar Position Algorithms */}
           <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5">
-            <h3 className="text-sm font-bold text-amber-700 mb-2 flex items-center gap-2">
-              <Sun className="w-4 h-4 text-amber-500" /> 1. Solar Geometry & Astronomical Position (SPA / Michalsky)
+            <h3 className="text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
+              <Sun className="w-4 h-4 text-slate-900" /> 1. Solar Geometry & Astronomical Position (SPA / Michalsky)
             </h3>
             <p className="mb-3">
               The sun's position relative to an observer at latitude &phi; and longitude &lambda; is defined by:
@@ -65,7 +65,7 @@ export const EducationModal: React.FC<EducationModalProps> = ({ isOpen, onClose 
               <Compass className="w-4 h-4 text-sky-600" /> 2. Transposition Model: Plane of Array (POA) Irradiance
             </h3>
             <p className="mb-2">
-              Horizontal irradiance measured by weather stations consists of Direct Normal Irradiance (DNI) and Diffuse Horizontal Irradiance (DHI). To simulate the sunlight hitting a tilted roof, HeliosPV applies the <strong>Hay-Davies transposition model</strong>:
+              Horizontal irradiance measured by weather stations consists of Direct Normal Irradiance (DNI) and Diffuse Horizontal Irradiance (DHI). To simulate the sunlight hitting a tilted roof, HI Grid applies the <strong>Hay-Davies transposition model</strong>:
             </p>
             <div className="bg-white border border-slate-200 rounded-xl p-3 font-mono text-[11px] text-sky-800 my-2 shadow-sm">
               POA = I_beam + I_diffuse + I_ground<br />
@@ -119,7 +119,7 @@ export const EducationModal: React.FC<EducationModalProps> = ({ isOpen, onClose 
                 href="https://pvwatts.nrel.gov/"
                 target="_blank"
                 rel="noreferrer"
-                className="text-amber-600 hover:underline flex items-center gap-1 text-[11px] font-medium"
+                className="text-slate-900 hover:underline flex items-center gap-1 text-[11px] font-semibold"
               >
                 NREL PVWatts <ExternalLink className="w-3 h-3" />
               </a>
@@ -127,7 +127,7 @@ export const EducationModal: React.FC<EducationModalProps> = ({ isOpen, onClose 
                 href="https://pvlib-python.readthedocs.io/"
                 target="_blank"
                 rel="noreferrer"
-                className="text-amber-600 hover:underline flex items-center gap-1 text-[11px] font-medium"
+                className="text-slate-900 hover:underline flex items-center gap-1 text-[11px] font-semibold"
               >
                 pvlib-python Docs <ExternalLink className="w-3 h-3" />
               </a>
@@ -135,7 +135,7 @@ export const EducationModal: React.FC<EducationModalProps> = ({ isOpen, onClose 
                 href="https://open-meteo.com/en/docs/solar-radiation-api"
                 target="_blank"
                 rel="noreferrer"
-                className="text-amber-600 hover:underline flex items-center gap-1 text-[11px] font-medium"
+                className="text-slate-900 hover:underline flex items-center gap-1 text-[11px] font-semibold"
               >
                 Open-Meteo Solar API <ExternalLink className="w-3 h-3" />
               </a>

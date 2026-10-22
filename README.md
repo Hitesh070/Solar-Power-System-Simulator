@@ -1,4 +1,4 @@
-# HeliosPV — Solar Power System Simulator (India Edition)
+# HI Grid — Solar Power System Simulator
 
 <p align="center">
   <img src="https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React 18" />

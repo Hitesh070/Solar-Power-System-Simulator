@@ -298,17 +298,17 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
         {/* HUD Top-Left: Solar Elevation & Azimuth */}
         <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
           <div className="bg-white/90 backdrop-blur-md border border-slate-200 rounded-xl px-4 py-2.5 shadow-sm text-xs flex items-center gap-3">
-            <div className={`w-2.5 h-2.5 rounded-full ${isSunUp ? 'bg-amber-500' : 'bg-slate-400'}`} />
+            <div className={`w-2.5 h-2.5 rounded-full ${isSunUp ? 'bg-slate-900' : 'bg-slate-400'}`} />
             <div>
               <span className="text-slate-500">Elevation:</span>{' '}
-              <span className={`font-mono font-bold ${isSunUp ? 'text-amber-600' : 'text-slate-500'}`}>
+              <span className={`font-mono font-bold ${isSunUp ? 'text-slate-900' : 'text-slate-500'}`}>
                 {solarAngles.elevationDeg.toFixed(1)}°
               </span>
             </div>
             <div className="h-3.5 w-px bg-slate-200" />
             <div>
               <span className="text-slate-500">Azimuth:</span>{' '}
-              <span className="font-mono font-bold text-sky-600">
+              <span className="font-mono font-bold text-slate-700">
                 {solarAngles.azimuthDeg.toFixed(1)}°
               </span>
             </div>
@@ -327,7 +327,7 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
               </>
             ) : (
               <>
-                <AlertCircle className="w-3.5 h-3.5 text-amber-500" />
+                <AlertCircle className="w-3.5 h-3.5 text-slate-600" />
                 <span className="font-medium">
                   {isSunUp ? 'High Incident Angle / Parapet Shade' : 'Night Time (Sun Below Horizon)'}
                 </span>
@@ -358,7 +358,7 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
 
         {/* HUD Bottom Center: Drag Hint */}
         <div className="absolute bottom-3 left-4 z-10 pointer-events-none text-[11px] text-slate-500 flex items-center gap-2 bg-white/80 px-3 py-1 rounded-full border border-slate-200 shadow-sm backdrop-blur-sm">
-          <Eye className="w-3.5 h-3.5 text-amber-500" />
+          <Eye className="w-3.5 h-3.5 text-slate-700" />
           <span>Flat Terrace Array • Click & Drag to Orbit • Scroll to Zoom</span>
         </div>
       </div>
@@ -370,7 +370,7 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
             onClick={() => setIsPlaying(!isPlaying)}
             className={`p-2.5 rounded-xl border transition-all ${
               isPlaying
-                ? 'bg-amber-500 border-amber-600 text-white shadow-sm'
+                ? 'bg-slate-900 border-black text-white shadow-sm'
                 : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-700'
             }`}
             title={isPlaying ? 'Pause' : 'Play 24h Cycle'}
@@ -381,9 +381,9 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
           <div className="flex-1 flex flex-col gap-1">
             <div className="flex justify-between items-center text-xs">
               <span className="text-slate-600 font-medium flex items-center gap-1.5">
-                <Sun className="w-3.5 h-3.5 text-amber-500" /> Time of Day
+                <Sun className="w-3.5 h-3.5 text-slate-900" /> Time of Day
               </span>
-              <span className="font-mono font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+              <span className="font-mono font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
                 {String(Math.floor(selectedHour)).padStart(2, '0')}:
                 {String(Math.floor((selectedHour % 1) * 60)).padStart(2, '0')}
               </span>
@@ -398,7 +398,7 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
                 setSelectedHour(parseFloat(e.target.value));
                 if (isPlaying) setIsPlaying(false);
               }}
-              className="w-full accent-amber-500 cursor-pointer h-1.5 bg-slate-200 rounded appearance-none"
+              className="w-full accent-slate-900 cursor-pointer h-1.5 bg-slate-200 rounded appearance-none"
             />
           </div>
         </div>
@@ -409,7 +409,7 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
           <select
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-            className="bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs text-slate-800 font-medium focus:outline-none focus:border-amber-500 shadow-sm"
+            className="bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs text-slate-800 font-medium focus:outline-none focus:border-slate-900 shadow-sm"
           >
             <option value={6}>June (Summer Solstice)</option>
             <option value={3}>March (Spring Equinox)</option>

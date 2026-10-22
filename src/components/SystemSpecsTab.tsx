@@ -35,7 +35,7 @@ export const SystemSpecsTab: React.FC<SystemSpecsTabProps> = ({ results }) => {
           <div>
             <div className="flex items-center justify-between text-slate-500 mb-2">
               <span className="text-[11px] font-semibold uppercase tracking-wider">DC:AC Inverter Ratio</span>
-              <Cpu className="w-4 h-4 text-amber-500" />
+              <Cpu className="w-4 h-4 text-slate-900" />
             </div>
             <div className="text-3xl font-bold text-slate-900 font-mono">{dcAcRatio}</div>
           </div>
@@ -49,8 +49,8 @@ export const SystemSpecsTab: React.FC<SystemSpecsTabProps> = ({ results }) => {
                 <CheckCircle2 className="w-4 h-4 text-sky-600" /> Conservative / Zero Clipping
               </span>
             ) : (
-              <span className="text-xs font-semibold text-amber-700 flex items-center gap-1.5">
-                <AlertTriangle className="w-4 h-4 text-amber-500" /> High DC Overdrive (Peak Clipping)
+              <span className="text-xs font-semibold text-slate-800 flex items-center gap-1.5">
+                <AlertTriangle className="w-4 h-4 text-slate-700" /> High DC Overdrive (Peak Clipping)
               </span>
             )}
           </div>
@@ -100,13 +100,13 @@ export const SystemSpecsTab: React.FC<SystemSpecsTabProps> = ({ results }) => {
         <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
           <div>
             <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-              <Wrench className="w-4 h-4 text-amber-500" /> Bill of Materials (BOM) & Equipment Schedule
+              <Wrench className="w-4 h-4 text-slate-900" /> Bill of Materials (BOM) & Equipment Schedule
             </h3>
             <p className="text-xs text-slate-500">
               Procurement specifications and electrical ratings based on certified equipment standards.
             </p>
           </div>
-          <span className="text-xs font-mono font-bold text-amber-700 bg-amber-50 border border-amber-200 px-3 py-1 rounded-xl">
+          <span className="text-xs font-mono font-bold text-slate-900 bg-slate-100 border border-slate-200 px-3 py-1 rounded-xl">
             {panelCount} Modules Total
           </span>
         </div>
@@ -130,7 +130,7 @@ export const SystemSpecsTab: React.FC<SystemSpecsTabProps> = ({ results }) => {
                 <td className="px-5 py-3.5 text-slate-500">
                   {panelWattage}W Half-Cut Bi-Facial / Mono PERC, {config.panelEfficiencyPercent}% efficiency
                 </td>
-                <td className="px-5 py-3.5 text-center font-mono font-bold text-amber-600">
+                <td className="px-5 py-3.5 text-center font-mono font-bold text-slate-900">
                   {panelCount} units
                 </td>
                 <td className="px-5 py-3.5 text-slate-500">25-Year Performance</td>
