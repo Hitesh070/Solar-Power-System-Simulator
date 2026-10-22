@@ -38,23 +38,23 @@ export const EducationModal: React.FC<EducationModalProps> = ({ isOpen, onClose 
           {/* Section 1: Solar Position Algorithms */}
           <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5">
             <h3 className="text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
-              <Sun className="w-4 h-4 text-slate-900" /> 1. Solar Geometry & Astronomical Position (SPA / Michalsky)
+              <Sun className="w-4 h-4 text-slate-900" /> 1. Solar Geometry & Astronomical Position (Spencer / NOAA Algorithm)
             </h3>
             <p className="mb-3">
               The sun's position relative to an observer at latitude &phi; and longitude &lambda; is defined by:
             </p>
             <ul className="list-disc list-inside space-y-1.5 text-slate-600 pl-1">
               <li>
-                <strong className="text-slate-900">Solar Zenith (&theta;_z):</strong> Angle between the sun and the vertical overhead zenith (0° at direct overhead, 90° at horizon).
+                <strong className="text-slate-900">Solar Zenith (&theta;_z):</strong> Angle between the sun and the vertical overhead zenith with atmospheric refraction correction.
               </li>
               <li>
-                <strong className="text-slate-900">Solar Elevation (&alpha;):</strong> Angle above the horizon (&alpha; = 90° - &theta;_z).
+                <strong className="text-slate-900">Solar Elevation (&alpha;):</strong> Apparent angle above the horizon (&alpha; = 90° - &theta;_z).
               </li>
               <li>
                 <strong className="text-slate-900">Solar Azimuth (&gamma;_s):</strong> Compass bearing from True North (0° = North, 90° = East, 180° = South, 270° = West).
               </li>
               <li>
-                <strong className="text-slate-900">Equation of Time (EqT):</strong> Accounts for the Earth's elliptical orbit and axial tilt causing solar noon to deviate from 12:00 clock time by up to &plusmn; 16 minutes.
+                <strong className="text-slate-900">Equation of Time (EqT):</strong> Accounts for the Earth's orbital eccentricity and axial obliquity causing solar noon to deviate from 12:00 clock time.
               </li>
             </ul>
           </div>
@@ -62,34 +62,36 @@ export const EducationModal: React.FC<EducationModalProps> = ({ isOpen, onClose 
           {/* Section 2: Plane of Array (POA) Irradiance */}
           <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5">
             <h3 className="text-sm font-bold text-sky-700 mb-2 flex items-center gap-2">
-              <Compass className="w-4 h-4 text-sky-600" /> 2. Transposition Model: Plane of Array (POA) Irradiance
+              <Compass className="w-4 h-4 text-sky-600" /> 2. Transposition Model: Plane of Array (POA) with ASHRAE IAM
             </h3>
             <p className="mb-2">
-              Horizontal irradiance measured by weather stations consists of Direct Normal Irradiance (DNI) and Diffuse Horizontal Irradiance (DHI). To simulate the sunlight hitting a tilted roof, HI Grid applies the <strong>Hay-Davies transposition model</strong>:
+              To simulate sunlight striking a tilted rooftop array, HI Grid applies the <strong>Hay-Davies transposition model</strong> coupled with physical <strong>Incidence Angle Modifier (IAM)</strong> glass transmission curves:
             </p>
             <div className="bg-white border border-slate-200 rounded-xl p-3 font-mono text-[11px] text-sky-800 my-2 shadow-sm">
-              POA = I_beam + I_diffuse + I_ground<br />
+              POA = I_beam × IAM(&theta;) + I_diffuse + I_ground<br />
+              IAM(&theta;) = 1 - 0.05 × (1 / cos &theta; - 1)<br />
               I_beam = DNI × max(0, cos &theta;)<br />
               I_ground = GHI × &rho; × ((1 - cos &beta;) / 2)
             </div>
             <p className="text-slate-500">
-              Where &theta; is the Angle of Incidence (AOI), &beta; is panel tilt, and &rho; &asymp; 0.20 is the standard ground albedo reflectance.
+              Where &theta; is the Angle of Incidence (AOI), &beta; is panel tilt, and &rho; &asymp; 0.20 is standard ground albedo.
             </p>
           </div>
 
-          {/* Section 3: Cell Temperature & King / Sandia Model */}
+          {/* Section 3: Cell Temperature & Faiman Model */}
           <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5">
             <h3 className="text-sm font-bold text-emerald-700 mb-2 flex items-center gap-2">
-              <Zap className="w-4 h-4 text-emerald-600" /> 3. Operating Cell Temperature & Power Derating
+              <Zap className="w-4 h-4 text-emerald-600" /> 3. Operating Cell Temperature (Faiman Model - IEC 61853)
             </h3>
             <p className="mb-2">
-              Solar panels are rated at <strong>Standard Test Conditions (STC: 1000 W/m² @ 25°C)</strong>. Under real sunlight, dark silicon cells heat up significantly higher than the surrounding air:
+              Under sunlight, dark silicon cells heat up significantly higher than ambient air. HI Grid implements the empirical <strong>Faiman heat transfer model</strong>:
             </p>
             <div className="bg-white border border-slate-200 rounded-xl p-3 font-mono text-[11px] text-emerald-800 my-2 shadow-sm">
-              T_cell = T_amb + (POA / 800) × (NOCT - 20) × exp(-0.05 × WindSpeed)
+              T_cell = T_amb + POA / (U_0 + U_1 × v_roof)<br />
+              U_0 = 25.0 W/m²K, U_1 = 6.84 W/m²K/(m/s), v_roof ≈ 0.76 × v_10m
             </div>
             <p className="text-slate-500">
-              Because silicon is a semiconductor, voltage drops as cell temperature rises (typically <strong className="text-slate-900">-0.35%/°C</strong>). On a 35°C summer day with cells reaching 65°C, panel power output drops by ~14% strictly due to heat.
+              Standard open-rack coefficients calibrate precisely to 45°C NOCT under standard reference conditions. Voltage derating of <strong className="text-slate-900">-0.35%/°C</strong> is applied for cell temperatures above 25°C STC.
             </p>
           </div>
 

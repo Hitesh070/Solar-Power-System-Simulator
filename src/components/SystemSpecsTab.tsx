@@ -12,8 +12,10 @@ export const SystemSpecsTab: React.FC<SystemSpecsTabProps> = ({ results }) => {
 
   const panelWattage = 540;
   const panelCount = Math.max(1, Math.round((config.systemCapacityKw * 1000) / panelWattage));
-  const totalModuleAreaSqM = Math.round(panelCount * 2.58 * 10) / 10;
-  const totalModuleAreaSqFt = Math.round(totalModuleAreaSqM * 10.764);
+  const moduleAreaSqM = Math.round(panelCount * 2.58 * 10) / 10;
+  // Inter-row pitch spacing for flat terrace (Ground Coverage Ratio ~0.45) avoids winter shadow clipping
+  const totalTerraceFootprintSqM = Math.round((moduleAreaSqM / 0.45) * 10) / 10;
+  const totalTerraceFootprintSqFt = Math.round(totalTerraceFootprintSqM * 10.764);
   const totalWeightKg = Math.round(panelCount * 28.5);
 
   const dcAcRatio =
@@ -63,11 +65,11 @@ export const SystemSpecsTab: React.FC<SystemSpecsTabProps> = ({ results }) => {
               <Layers className="w-4 h-4 text-sky-600" />
             </div>
             <div className="text-3xl font-bold text-slate-900 font-mono">
-              {totalModuleAreaSqFt} <span className="text-sm font-sans text-slate-500 font-normal">sq ft</span>
+              {totalTerraceFootprintSqFt} <span className="text-sm font-sans text-slate-500 font-normal">sq ft</span>
             </div>
           </div>
           <div className="mt-3 text-xs text-slate-500 font-mono">
-            {totalModuleAreaSqM} m² • ~{totalWeightKg} kg array deadload
+            {totalTerraceFootprintSqM} m² with pitch • ~{totalWeightKg} kg array deadload
           </div>
         </div>
 

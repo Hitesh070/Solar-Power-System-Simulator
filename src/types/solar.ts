@@ -65,6 +65,7 @@ export interface HourlySimulationResult {
   batterySocPercent: number;   // Battery SoC at end of hour (0-100%)
   gridExportKw: number;        // Surplus sent to grid (units)
   gridImportKw: number;        // Units drawn from Discom grid
+  unmetLoadKw?: number;        // Unmet load (for off-grid systems)
 }
 
 export interface MonthlySummary {
@@ -92,6 +93,7 @@ export interface FinancialMetrics {
   carbonOffsetTonnesPerYear: number;
   equivalentTreesPlanted: number;
   yearlyCashFlow: number[];       // 25-year cumulative cash flow in ₹
+  lpspPercent?: number;           // Loss of power supply probability (off-grid)
 }
 
 export interface CompleteSimulationResults {

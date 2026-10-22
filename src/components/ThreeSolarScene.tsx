@@ -20,7 +20,7 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
 }) => {
   const mountRef = useRef<HTMLDivElement>(null);
   const [selectedHour, setSelectedHour] = useState<number>(12.5); // 12:30 PM (Solar Noon)
-  const [selectedMonth, setSelectedMonth] = useState<number>(5); // May (High summer insolation)
+  const [selectedMonth, setSelectedMonth] = useState<number>(6); // June (Summer Solstice)
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [cameraView, setCameraView] = useState<'iso' | 'top' | 'front' | 'solar'>('iso');
 
@@ -39,8 +39,16 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
   const cameraPhiRef = useRef<number>(Math.PI / 3.2);
   const cameraRadiusRef = useRef<number>(26);
 
-  // Solar position calculation for current hour and month
-  const testDate = new Date(Date.UTC(2026, selectedMonth - 1, 21, Math.floor(selectedHour), (selectedHour % 1) * 60));
+  // Solar position calculation: convert local site clock hour to UTC for solar engine
+  const localUtcOffsetHours = Math.round(longitude / 15);
+  const utcHourDecimal = (selectedHour - localUtcOffsetHours + 24) % 24;
+  const testDate = new Date(Date.UTC(
+    2026,
+    selectedMonth - 1,
+    21,
+    Math.floor(utcHourDecimal),
+    Math.round((utcHourDecimal % 1) * 60)
+  ));
   const solarAngles = calculateSolarAngles(latitude, longitude, testDate);
 
   // Direct sun check
@@ -86,8 +94,7 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.0;
-    container.innerHTML = '';
-    container.appendChild(renderer.domElement);
+    container.replaceChildren(renderer.domElement);
     rendererRef.current = renderer;
 
     // 4. Lights — Natural soft outdoor sunlight
@@ -199,15 +206,16 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
   useEffect(() => {
     if (!sunLightRef.current || !sunMeshRef.current) return;
 
-    const elevationRad = solarAngles.elevationDeg * (Math.PI / 180);
-    const azimuthRad = (solarAngles.azimuthDeg - 180) * (Math.PI / 180);
+    const elevationRad = Math.max(-0.1, solarAngles.elevationDeg) * (Math.PI / 180);
+    const azimuthRad = solarAngles.azimuthDeg * (Math.PI / 180);
 
     const sunDistance = 35;
     const isAboveHorizon = solarAngles.elevationDeg > 0;
 
+    // Standard cartographic coordinates: +X is East, -X is West, -Z is North, +Z is South
     const x = sunDistance * Math.cos(elevationRad) * Math.sin(azimuthRad);
     const y = Math.max(-5, sunDistance * Math.sin(elevationRad));
-    const z = sunDistance * Math.cos(elevationRad) * Math.cos(azimuthRad);
+    const z = -sunDistance * Math.cos(elevationRad) * Math.cos(azimuthRad);
 
     sunLightRef.current.position.set(x, y, z);
     sunMeshRef.current.position.set(x, y, z);
@@ -275,7 +283,7 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
       cameraPhiRef.current = Math.PI / 2.3;
       cameraRadiusRef.current = 22;
     } else if (view === 'solar') {
-      const azRad = (solarAngles.azimuthDeg - 180) * (Math.PI / 180);
+      const azRad = solarAngles.azimuthDeg * (Math.PI / 180);
       cameraThetaRef.current = azRad;
       cameraPhiRef.current = Math.PI / 3;
       cameraRadiusRef.current = 26;
@@ -287,7 +295,6 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
     <div className="relative flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
       {/* 3D Canvas Viewport */}
       <div
-        ref={mountRef}
         className="w-full h-[460px] cursor-grab active:cursor-grabbing relative select-none"
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -295,6 +302,7 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
         onMouseLeave={handleMouseUp}
         onWheel={handleWheel}
       >
+        <div ref={mountRef} className="absolute inset-0 w-full h-full pointer-events-none" />
         {/* HUD Top-Left: Solar Elevation & Azimuth */}
         <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
           <div className="bg-white/90 backdrop-blur-md border border-slate-200 rounded-xl px-4 py-2.5 shadow-sm text-xs flex items-center gap-3">
@@ -575,8 +583,14 @@ function updateElevatedTerracePanels(
   azimuthDeg: number,
   capacityKw: number
 ) {
+  // Dispose old geometries to eliminate GPU WebGL memory leaks
   while (panelsGroup.children.length > 0) {
     const child = panelsGroup.children[0];
+    child.traverse((node) => {
+      if ((node as THREE.Mesh).isMesh) {
+        (node as THREE.Mesh).geometry?.dispose();
+      }
+    });
     panelsGroup.remove(child);
   }
 
@@ -625,15 +639,18 @@ function updateElevatedTerracePanels(
   arrayMount.position.set(1.0, arrayBaseY, 0.4);
 
   // Rotate entire mount by Azimuth around vertical Y axis
-  // 180° = True South (+Z), 0° = North (-Z), 90° = East (+X), 270° = West (-X)
-  const azimuthRad = (azimuthDeg - 180) * (Math.PI / 180);
-  arrayMount.rotation.y = azimuthRad;
+  // In Three.js: -Z is North, +Z is True South (180°), +X is East (90°), -X is West (270°)
+  // When azimuth is 180° (True South), rotation is 0
+  arrayMount.rotation.y = (180 - azimuthDeg) * (Math.PI / 180);
 
   // Child group for tilting the panels along the lower pivot axis
+  // tiltDeg = 0 means panels are flat on the roof with normal pointing up (0, 1, 0)
+  // Box geometry default normal is (0, 0, 1).
+  // When rotated around X by (tiltRad - Math.PI / 2), the normal becomes (0, cos(tilt), sin(tilt))
+  // which tilts towards South (+Z) and faces up towards the sky!
   const tiltGroup = new THREE.Group();
   const tiltRad = tiltDeg * (Math.PI / 180);
-  // Panel tilt rotates around X axis
-  tiltGroup.rotation.x = Math.PI / 2 - tiltRad;
+  tiltGroup.rotation.x = tiltRad - Math.PI / 2;
 
   let added = 0;
   const totalArrayWidth = cols * (panelWidth + 0.05);

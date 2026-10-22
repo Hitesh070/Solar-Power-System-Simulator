@@ -12,8 +12,8 @@ export interface SolarAngles {
 }
 
 /**
- * Calculates solar angles using Michalsky / Spencer solar position approximations.
- * Accuracy within ±0.05 degrees, sufficient for utility-grade photovoltaic engineering.
+ * Calculates solar angles using Spencer / NOAA solar position equations with atmospheric refraction.
+ * Computes solar zenith, elevation, and true azimuth relative to True North.
  */
 export function calculateSolarAngles(
   latDeg: number,
@@ -72,9 +72,15 @@ export function calculateSolarAngles(
   const clampedCosZenith = Math.max(-1, Math.min(1, cosZenith));
   const zenithRad = Math.acos(clampedCosZenith);
   const zenithDeg = zenithRad * RAD_TO_DEG;
-  const elevationDeg = 90 - zenithDeg;
+  let elevationDeg = 90 - zenithDeg;
 
-  // Solar azimuth angle (degrees from true North, clockwise)
+  // Atmospheric refraction correction for true apparent elevation
+  if (elevationDeg > -0.85) {
+    const rArcmin = 1.02 / Math.tan((elevationDeg + 10.3 / (elevationDeg + 5.11)) * DEG_TO_RAD);
+    elevationDeg += rArcmin / 60;
+  }
+
+  // Solar azimuth angle (degrees from true North, clockwise: 0° N, 90° E, 180° S, 270° W)
   let azimuthDeg = 0;
   if (elevationDeg > -5) {
     const sinElevation = Math.sin(elevationDeg * DEG_TO_RAD);
@@ -94,7 +100,7 @@ export function calculateSolarAngles(
   }
 
   return {
-    zenithDeg: Math.max(0, Math.min(180, zenithDeg)),
+    zenithDeg: Math.max(0, Math.min(180, 90 - elevationDeg)),
     elevationDeg,
     azimuthDeg: (azimuthDeg + 360) % 360,
     hourAngleDeg,
@@ -103,7 +109,8 @@ export function calculateSolarAngles(
 }
 
 /**
- * Calculates Plane of Array (POA) Irradiance using the Hay-Davies transposition model.
+ * Calculates Plane of Array (POA) Irradiance using the Hay-Davies transposition model
+ * with ASHRAE physical Incidence Angle Modifier (IAM).
  * Factors in direct beam, sky diffuse (circumsolar + isotropic), and ground-reflected albedo.
  */
 export function calculatePlaneOfArrayIrradiance(
@@ -112,10 +119,10 @@ export function calculatePlaneOfArrayIrradiance(
   panelTiltDeg: number,
   panelAzimuthDeg: number,
   groundAlbedo: number = 0.20
-): { poaTotal: number; poaBeam: number; poaDiffuse: number; poaGround: number } {
+): { poaTotal: number; poaBeam: number; poaDiffuse: number; poaGround: number; iam: number } {
   // If sun is below horizon, irradiance on array is 0
   if (solarAngles.elevationDeg <= 0) {
-    return { poaTotal: 0, poaBeam: 0, poaDiffuse: 0, poaGround: 0 };
+    return { poaTotal: 0, poaBeam: 0, poaDiffuse: 0, poaGround: 0, iam: 0 };
   }
 
   const zenithRad = solarAngles.zenithDeg * DEG_TO_RAD;
@@ -129,13 +136,29 @@ export function calculatePlaneOfArrayIrradiance(
     Math.sin(zenithRad) * Math.sin(tiltRad) * Math.cos(solarAzimuthRad - panelAzimuthRad);
 
   const cosTheta = Math.max(0, cosIncidence);
+  const aoiDeg = Math.acos(Math.min(1, cosTheta)) * RAD_TO_DEG;
 
-  // 1. Beam irradiance on tilted array
-  const poaBeam = weather.dni * cosTheta;
+  // Physical Incidence Angle Modifier (IAM) - ASHRAE Standard Model (b0 = 0.05)
+  // Accounts for front glass reflection losses at oblique incidence angles
+  let iam = 1.0;
+  if (aoiDeg < 80) {
+    iam = Math.max(0, 1 - 0.05 * (1 / Math.max(0.01, cosTheta) - 1));
+  } else if (aoiDeg < 90) {
+    const iam80 = Math.max(0, 1 - 0.05 * (1 / Math.cos(80 * DEG_TO_RAD) - 1));
+    iam = Math.max(0, iam80 * (90 - aoiDeg) / 10);
+  } else {
+    iam = 0;
+  }
+
+  // 1. Beam irradiance on tilted array with IAM transmission factor
+  const poaBeam = weather.dni * cosTheta * iam;
 
   // 2. Diffuse irradiance on tilted array (Hay-Davies model)
-  // Anisotropy index Ai = DNI / extraterrestrial irradiance (~1367 W/m²)
-  const extraterrestrialIrradiance = 1367;
+  // Eccentricity-corrected extraterrestrial irradiance I0 = 1361 * (1 + 0.033 * cos(2pi * n / 365))
+  const dt = new Date(weather.datetime);
+  const dayOfYear = Math.floor((dt.getTime() - new Date(Date.UTC(dt.getUTCFullYear(), 0, 1)).getTime()) / 86400000) + 1;
+  const e0 = 1 + 0.033 * Math.cos((2 * Math.PI * dayOfYear) / 365);
+  const extraterrestrialIrradiance = 1361 * e0;
   const anisotropyIndex = Math.min(1, Math.max(0, weather.dni / extraterrestrialIrradiance));
 
   const cosZenithSafe = Math.max(0.087, Math.cos(zenithRad)); // avoid divide by zero near horizon
@@ -152,22 +175,28 @@ export function calculatePlaneOfArrayIrradiance(
 
   const poaTotal = Math.max(0, poaBeam + poaDiffuse + poaGround);
 
-  return { poaTotal, poaBeam, poaDiffuse, poaGround };
+  return { poaTotal, poaBeam, poaDiffuse, poaGround, iam };
 }
 
 /**
- * Calculates cell operating temperature based on Sandia / King NOCT formula:
- * T_cell = T_ambient + (POA / 800) * (NOCT - 20) * exp(-0.05 * WindSpeed)
+ * Calculates cell operating temperature based on the Faiman model (IEC 61853 / PVsyst standard):
+ * T_cell = T_amb + POA / (U0 + U1 * v_roof)
+ * Standard open-rack / elevated terrace parameters: U0 = 25.0 W/m²K, U1 = 6.84 W/m²K/(m/s).
+ * Height corrected: v_roof ≈ v_10m * 0.76.
  */
 export function calculateCellTemperature(
   poaIrradianceW: number,
   tempAmbientC: number,
   windSpeedMs: number,
-  noctC: number = 45
+  u0: number = 25.0,
+  u1: number = 6.84
 ): number {
   if (poaIrradianceW <= 1) return tempAmbientC;
-  const windCooling = Math.exp(-0.05 * Math.max(0, windSpeedMs));
-  const tempRise = (poaIrradianceW / 800) * (noctC - 20) * windCooling;
+
+  const vRoof = Math.max(0.2, windSpeedMs * 0.76);
+  const heatLossFactor = u0 + u1 * vRoof;
+  const tempRise = poaIrradianceW / heatLossFactor;
+
   return tempAmbientC + tempRise;
 }
 
@@ -176,7 +205,7 @@ export function calculateCellTemperature(
  * - STC rated nameplate power (kW)
  * - Temperature derating (e.g. -0.35%/°C above 25°C STC)
  * - System soiling, mismatch, and wiring resistance losses
- * - Inverter efficiency curve & MPPT power clipping
+ * - Smooth part-load inverter efficiency curve & MPPT power clipping
  */
 export function calculatePowerOutput(
   poaIrradianceW: number,
@@ -204,15 +233,15 @@ export function calculatePowerOutput(
   );
 
   // Inverter Model:
-  // Part-load efficiency drop: efficiency drops slightly at low load (<10%) and hits peak at ~40-80%
+  // Smooth CEC/Euro-style part-load efficiency curve:
+  // Zero power below 0.5% threshold; rapidly scales to ~95% by 10% load, peaks at ~98% near 50-70% load.
   const loadRatio = config.inverterCapacityKw > 0 ? dcPowerKw / config.inverterCapacityKw : 0;
-  let effectiveInverterEfficiency = config.inverterEfficiencyPercent / 100;
+  const maxEff = config.inverterEfficiencyPercent / 100;
+  let effectiveInverterEfficiency = 0;
 
-  if (loadRatio < 0.1 && loadRatio > 0.01) {
-    // Quadratic drop at low power
-    effectiveInverterEfficiency *= (0.85 + 1.5 * loadRatio);
-  } else if (loadRatio <= 0.01) {
-    effectiveInverterEfficiency = 0;
+  if (loadRatio > 0.005) {
+    const partLoadFactor = (1 - Math.exp(-22 * loadRatio)) * (1 - 0.015 * Math.max(0, loadRatio - 0.5));
+    effectiveInverterEfficiency = maxEff * Math.max(0, Math.min(1.0, partLoadFactor));
   }
 
   // AC Power with inverter clipping limit
