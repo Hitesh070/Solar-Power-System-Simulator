@@ -1,0 +1,309 @@
+import React, { useState } from 'react';
+import { Clock } from 'lucide-react';
+import { CompleteSimulationResults, HourlySimulationResult } from '../types/solar';
+
+interface HourlySimulationTabProps {
+  results: CompleteSimulationResults;
+}
+
+export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ results }) => {
+  const { hourly, config } = results;
+  const [selectedDayIndex, setSelectedDayIndex] = useState<number>(0);
+  const [hoveredHour, setHoveredHour] = useState<number | null>(null);
+
+  // Group hours by 24-hour days
+  const totalDays = Math.max(1, Math.floor(hourly.length / 24));
+  const currentDayHours: HourlySimulationResult[] = hourly.slice(
+    selectedDayIndex * 24,
+    (selectedDayIndex + 1) * 24
+  );
+
+  const activeHourData =
+    hoveredHour !== null && currentDayHours[hoveredHour]
+      ? currentDayHours[hoveredHour]
+      : currentDayHours[12] || currentDayHours[0];
+
+  // Peak metrics for scaling charts
+  const maxSolarPower = Math.max(1, ...currentDayHours.map((h) => h.solarAcPowerKw));
+  const maxLoad = Math.max(1, ...currentDayHours.map((h) => h.loadKw));
+  const maxChartPower = Math.max(maxSolarPower, maxLoad) * 1.15;
+
+  return (
+    <div className="flex flex-col gap-6">
+      {/* Day Selector Header */}
+      <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-amber-500/10 text-amber-400 rounded-xl">
+            <Clock className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-white">24-Hour Diurnal Dispatch Profile</h3>
+            <p className="text-xs text-slate-400">
+              Interactive hourly energy balance between PV array, battery, household load, and grid.
+            </p>
+          </div>
+        </div>
+
+        {/* Day Slider */}
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <span className="text-xs text-slate-400 whitespace-nowrap">
+            Day {selectedDayIndex + 1} of {totalDays}:
+          </span>
+          <input
+            type="range"
+            min="0"
+            max={totalDays - 1}
+            value={selectedDayIndex}
+            onChange={(e) => setSelectedDayIndex(parseInt(e.target.value))}
+            className="w-32 accent-amber-500 cursor-pointer h-1.5 bg-slate-800 rounded"
+          />
+          <span className="text-xs font-mono font-bold text-amber-400 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800">
+            {currentDayHours[0]?.datetime.split('T')[0] || `Day ${selectedDayIndex + 1}`}
+          </span>
+        </div>
+      </div>
+
+      {/* Main Interactive Hourly Chart (Custom SVG Vector Renderer for ultra-fluid performance) */}
+      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col gap-4">
+        {/* Chart Legend */}
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-3">
+          <div className="flex items-center gap-4 text-xs font-medium">
+            <div className="flex items-center gap-1.5">
+              <span className="w-3 h-3 rounded-full bg-amber-400" />
+              <span className="text-slate-300">Solar AC Output (kW)</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-3 h-3 rounded-full bg-purple-400" />
+              <span className="text-slate-300">Demand Load (kW)</span>
+            </div>
+            {config.hasBattery && (
+              <div className="flex items-center gap-1.5">
+                <span className="w-3 h-3 rounded-full bg-emerald-400" />
+                <span className="text-slate-300">Battery SoC (%)</span>
+              </div>
+            )}
+            <div className="flex items-center gap-1.5">
+              <span className="w-3 h-3 rounded-full bg-sky-400" />
+              <span className="text-slate-300">Grid Export (kW)</span>
+            </div>
+          </div>
+
+          {/* Real-time Hovered Stat */}
+          {activeHourData && (
+            <div className="text-xs bg-slate-950 px-3 py-1 rounded-xl border border-slate-800 flex items-center gap-2">
+              <span className="text-slate-400">Hour {activeHourData.hour}:00</span>
+              <span className="text-amber-400 font-mono font-bold">
+                PV: {activeHourData.solarAcPowerKw} kW
+              </span>
+              <span className="text-purple-400 font-mono font-bold">
+                Load: {activeHourData.loadKw} kW
+              </span>
+              {config.hasBattery && (
+                <span className="text-emerald-400 font-mono font-bold">
+                  SoC: {activeHourData.batterySocPercent}%
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* SVG Curve Chart */}
+        <div className="relative w-full h-72">
+          <svg
+            viewBox="0 0 800 240"
+            className="w-full h-full overflow-visible"
+            preserveAspectRatio="none"
+          >
+            {/* Horizontal Grid lines */}
+            {[0, 0.25, 0.5, 0.75, 1.0].map((ratio, idx) => {
+              const y = 220 - ratio * 190;
+              const kwVal = (maxChartPower * ratio).toFixed(1);
+              return (
+                <g key={idx}>
+                  <line
+                    x1="40"
+                    y1={y}
+                    x2="780"
+                    y2={y}
+                    stroke="#1e293b"
+                    strokeDasharray="4 4"
+                    strokeWidth="1"
+                  />
+                  <text
+                    x="32"
+                    y={y + 3}
+                    textAnchor="end"
+                    fill="#64748b"
+                    fontSize="9"
+                    fontFamily="monospace"
+                  >
+                    {kwVal}kW
+                  </text>
+                </g>
+              );
+            })}
+
+            {/* Solar PV Generation Filled Curve */}
+            {(() => {
+              const points = currentDayHours.map((h, i) => {
+                const x = 50 + (i / 23) * 720;
+                const y = 220 - (h.solarAcPowerKw / maxChartPower) * 190;
+                return `${x},${y}`;
+              });
+              const areaPath = `M 50,220 L ${points.join(' L ')} L 770,220 Z`;
+              const linePath = `M ${points.join(' L ')}`;
+
+              return (
+                <g>
+                  <defs>
+                    <linearGradient id="solarGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.45" />
+                      <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.0" />
+                    </linearGradient>
+                  </defs>
+                  <path d={areaPath} fill="url(#solarGradient)" />
+                  <path d={linePath} fill="none" stroke="#fbbf24" strokeWidth="2.5" />
+                </g>
+              );
+            })()}
+
+            {/* Demand Load Line Curve */}
+            {(() => {
+              const points = currentDayHours.map((h, i) => {
+                const x = 50 + (i / 23) * 720;
+                const y = 220 - (h.loadKw / maxChartPower) * 190;
+                return `${x},${y}`;
+              });
+              return (
+                <path
+                  d={`M ${points.join(' L ')}`}
+                  fill="none"
+                  stroke="#c084fc"
+                  strokeWidth="2.5"
+                  strokeDasharray="6 3"
+                />
+              );
+            })()}
+
+            {/* Battery SoC Curve (Right Y-axis 0-100%) */}
+            {config.hasBattery &&
+              (() => {
+                const points = currentDayHours.map((h, i) => {
+                  const x = 50 + (i / 23) * 720;
+                  const y = 220 - (h.batterySocPercent / 100) * 190;
+                  return `${x},${y}`;
+                });
+                return (
+                  <path
+                    d={`M ${points.join(' L ')}`}
+                    fill="none"
+                    stroke="#34d399"
+                    strokeWidth="2"
+                  />
+                );
+              })()}
+
+            {/* Hover bar indicator */}
+            {hoveredHour !== null && (
+              <line
+                x1={50 + (hoveredHour / 23) * 720}
+                y1="30"
+                x2={50 + (hoveredHour / 23) * 720}
+                y2="220"
+                stroke="#f59e0b"
+                strokeWidth="1.5"
+                strokeDasharray="2 2"
+              />
+            )}
+
+            {/* X-axis Hour markers */}
+            {currentDayHours.map((h, i) => {
+              const x = 50 + (i / 23) * 720;
+              return (
+                <g key={i}>
+                  {i % 3 === 0 && (
+                    <>
+                      <line x1={x} y1="220" x2={x} y2="225" stroke="#475569" strokeWidth="1" />
+                      <text
+                        x={x}
+                        y="237"
+                        textAnchor="middle"
+                        fill="#94a3b8"
+                        fontSize="9"
+                        fontFamily="monospace"
+                      >
+                        {h.hour}:00
+                      </text>
+                    </>
+                  )}
+                  {/* Invisible hit box for hovering */}
+                  <rect
+                    x={x - 15}
+                    y="20"
+                    width="30"
+                    height="200"
+                    fill="transparent"
+                    className="cursor-pointer"
+                    onMouseEnter={() => setHoveredHour(i)}
+                    onMouseLeave={() => setHoveredHour(null)}
+                  />
+                </g>
+              );
+            })}
+          </svg>
+        </div>
+      </div>
+
+      {/* Hourly Detail Cards Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4">
+          <div className="text-xs text-slate-400 mb-1">POA Irradiance:</div>
+          <div className="text-xl font-bold font-mono text-amber-400">
+            {activeHourData.poaIrradianceW} W/m²
+          </div>
+          <div className="text-[11px] text-slate-500 mt-1">
+            Cell Temp: {activeHourData.cellTempC}°C
+          </div>
+        </div>
+
+        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4">
+          <div className="text-xs text-slate-400 mb-1">Direct Solar Used:</div>
+          <div className="text-xl font-bold font-mono text-emerald-400">
+            {activeHourData.directSolarUsedKw} kW
+          </div>
+          <div className="text-[11px] text-slate-500 mt-1">
+            AC Solar: {activeHourData.solarAcPowerKw} kW
+          </div>
+        </div>
+
+        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4">
+          <div className="text-xs text-slate-400 mb-1">Battery Power:</div>
+          <div className="text-xl font-bold font-mono text-sky-400">
+            {activeHourData.batteryChargeKw > 0
+              ? `+${activeHourData.batteryChargeKw} kW (Chg)`
+              : activeHourData.batteryDischargeKw > 0
+              ? `-${activeHourData.batteryDischargeKw} kW (Dis)`
+              : 'Idle'}
+          </div>
+          <div className="text-[11px] text-slate-500 mt-1">
+            SoC: {activeHourData.batterySocPercent}%
+          </div>
+        </div>
+
+        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4">
+          <div className="text-xs text-slate-400 mb-1">Grid Interaction:</div>
+          <div className="text-xl font-bold font-mono text-purple-400">
+            {activeHourData.gridExportKw > 0
+              ? `+${activeHourData.gridExportKw} kW Export`
+              : activeHourData.gridImportKw > 0
+              ? `-${activeHourData.gridImportKw} kW Import`
+              : 'Zero Net Grid'}
+          </div>
+          <div className="text-[11px] text-slate-500 mt-1">
+            Demand: {activeHourData.loadKw} kW
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
