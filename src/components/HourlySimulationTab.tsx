@@ -29,22 +29,22 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
   return (
     <div className="flex flex-col gap-5">
       {/* Day Selector Header */}
-      <div className="bg-[#0f1422] border border-[#1e2638] rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-amber-500/10 text-amber-400 rounded-lg">
+          <div className="p-2 bg-amber-50 text-amber-600 rounded-xl border border-amber-200">
             <Clock className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-white">24-Hour Diurnal Power Profile</h3>
-            <p className="text-xs text-slate-400">
-              Interactive hourly energy balance between solar PV array, battery, household load, and Discom grid.
+            <h3 className="text-sm font-bold text-slate-900">24-Hour Diurnal Power Profile</h3>
+            <p className="text-xs text-slate-500">
+              Interactive hourly energy balance between solar PV array, battery, household load, and grid.
             </p>
           </div>
         </div>
 
         {/* Day Slider */}
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <span className="text-xs text-slate-400 whitespace-nowrap">
+          <span className="text-xs text-slate-500 font-medium whitespace-nowrap">
             Day {selectedDayIndex + 1} of {totalDays}:
           </span>
           <input
@@ -53,49 +53,49 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
             max={totalDays - 1}
             value={selectedDayIndex}
             onChange={(e) => setSelectedDayIndex(parseInt(e.target.value))}
-            className="w-32 accent-amber-500 cursor-pointer h-1.5 bg-slate-800 rounded"
+            className="w-32 accent-amber-500 cursor-pointer h-1.5 bg-slate-200 rounded"
           />
-          <span className="text-xs font-mono font-bold text-amber-400 bg-[#080c14] px-2.5 py-1 rounded-lg border border-[#1e2638]">
+          <span className="text-xs font-mono font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">
             {currentDayHours[0]?.datetime.split('T')[0] || `Day ${selectedDayIndex + 1}`}
           </span>
         </div>
       </div>
 
       {/* Main Hourly Chart */}
-      <div className="bg-[#0f1422] border border-[#1e2638] rounded-2xl p-6 shadow-xl flex flex-col gap-4">
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#1e2638] pb-3">
+      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-3">
           <div className="flex items-center gap-4 text-xs font-medium">
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-              <span className="text-slate-300">Solar AC (kW)</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+              <span className="text-slate-700">Solar AC (kW)</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-purple-400" />
-              <span className="text-slate-300">Demand Load (kW)</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-purple-500" />
+              <span className="text-slate-700">Demand Load (kW)</span>
             </div>
             {config.hasBattery && (
               <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-                <span className="text-slate-300">Battery SoC (%)</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                <span className="text-slate-700">Battery SoC (%)</span>
               </div>
             )}
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-sky-400" />
-              <span className="text-slate-300">Discom Export (kW)</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-sky-500" />
+              <span className="text-slate-700">Export (kW)</span>
             </div>
           </div>
 
           {activeHourData && (
-            <div className="text-xs bg-[#080c14] px-3 py-1 rounded-xl border border-[#1e2638] flex items-center gap-2">
-              <span className="text-slate-400">Hour {activeHourData.hour}:00</span>
-              <span className="text-amber-400 font-mono font-bold">
+            <div className="text-xs bg-slate-50 px-3 py-1 rounded-xl border border-slate-200 flex items-center gap-2">
+              <span className="text-slate-500">Hour {activeHourData.hour}:00</span>
+              <span className="text-amber-700 font-mono font-bold">
                 PV: {activeHourData.solarAcPowerKw} kW
               </span>
-              <span className="text-purple-400 font-mono font-bold">
+              <span className="text-purple-700 font-mono font-bold">
                 Load: {activeHourData.loadKw} kW
               </span>
               {config.hasBattery && (
-                <span className="text-emerald-400 font-mono font-bold">
+                <span className="text-emerald-700 font-mono font-bold">
                   SoC: {activeHourData.batterySocPercent}%
                 </span>
               )}
@@ -120,7 +120,7 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
                     y1={y}
                     x2="780"
                     y2={y}
-                    stroke="#161e30"
+                    stroke="#f1f5f9"
                     strokeDasharray="4 4"
                     strokeWidth="1"
                   />
@@ -128,7 +128,7 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
                     x="32"
                     y={y + 3}
                     textAnchor="end"
-                    fill="#64748b"
+                    fill="#94a3b8"
                     fontSize="9"
                     fontFamily="monospace"
                   >
@@ -151,12 +151,12 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
               return (
                 <g>
                   <defs>
-                    <linearGradient id="solarGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.35" />
+                    <linearGradient id="solarGradientLight" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.3" />
                       <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.0" />
                     </linearGradient>
                   </defs>
-                  <path d={areaPath} fill="url(#solarGradient)" />
+                  <path d={areaPath} fill="url(#solarGradientLight)" />
                   <path d={linePath} fill="none" stroke="#f59e0b" strokeWidth="2.5" />
                 </g>
               );
@@ -173,8 +173,8 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
                 <path
                   d={`M ${points.join(' L ')}`}
                   fill="none"
-                  stroke="#c084fc"
-                  strokeWidth="2.2"
+                  stroke="#9333ea"
+                  strokeWidth="2"
                   strokeDasharray="5 3"
                 />
               );
@@ -218,7 +218,7 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
                 <g key={i}>
                   {i % 3 === 0 && (
                     <>
-                      <line x1={x} y1="220" x2={x} y2="225" stroke="#334155" strokeWidth="1" />
+                      <line x1={x} y1="220" x2={x} y2="225" stroke="#cbd5e1" strokeWidth="1" />
                       <text
                         x={x}
                         y="237"
@@ -250,50 +250,50 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
 
       {/* Hourly Detail Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-[#0f1422] border border-[#1e2638] rounded-xl p-4">
-          <div className="text-xs text-slate-400 mb-1">POA Irradiance:</div>
-          <div className="text-xl font-bold font-mono text-amber-400">
+        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+          <div className="text-xs text-slate-500 mb-1">POA Irradiance:</div>
+          <div className="text-xl font-bold font-mono text-amber-600">
             {activeHourData.poaIrradianceW} W/m²
           </div>
-          <div className="text-[11px] text-slate-500 mt-1">
+          <div className="text-[11px] text-slate-400 mt-1">
             Cell Temp: {activeHourData.cellTempC}°C
           </div>
         </div>
 
-        <div className="bg-[#0f1422] border border-[#1e2638] rounded-xl p-4">
-          <div className="text-xs text-slate-400 mb-1">Direct Solar Used:</div>
-          <div className="text-xl font-bold font-mono text-emerald-400">
+        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+          <div className="text-xs text-slate-500 mb-1">Direct Solar Used:</div>
+          <div className="text-xl font-bold font-mono text-emerald-600">
             {activeHourData.directSolarUsedKw} kW
           </div>
-          <div className="text-[11px] text-slate-500 mt-1">
+          <div className="text-[11px] text-slate-400 mt-1">
             AC Output: {activeHourData.solarAcPowerKw} kW
           </div>
         </div>
 
-        <div className="bg-[#0f1422] border border-[#1e2638] rounded-xl p-4">
-          <div className="text-xs text-slate-400 mb-1">Battery Storage:</div>
-          <div className="text-xl font-bold font-mono text-sky-400">
+        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+          <div className="text-xs text-slate-500 mb-1">Battery Storage:</div>
+          <div className="text-xl font-bold font-mono text-sky-600">
             {activeHourData.batteryChargeKw > 0
               ? `+${activeHourData.batteryChargeKw} kW (Chg)`
               : activeHourData.batteryDischargeKw > 0
               ? `-${activeHourData.batteryDischargeKw} kW (Dis)`
               : 'Idle'}
           </div>
-          <div className="text-[11px] text-slate-500 mt-1">
+          <div className="text-[11px] text-slate-400 mt-1">
             SoC: {activeHourData.batterySocPercent}%
           </div>
         </div>
 
-        <div className="bg-[#0f1422] border border-[#1e2638] rounded-xl p-4">
-          <div className="text-xs text-slate-400 mb-1">Discom Grid:</div>
-          <div className="text-xl font-bold font-mono text-purple-400">
+        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+          <div className="text-xs text-slate-500 mb-1">Grid Interaction:</div>
+          <div className="text-xl font-bold font-mono text-purple-600">
             {activeHourData.gridExportKw > 0
               ? `+${activeHourData.gridExportKw} kW Export`
               : activeHourData.gridImportKw > 0
               ? `-${activeHourData.gridImportKw} kW Import`
               : 'Zero Net'}
           </div>
-          <div className="text-[11px] text-slate-500 mt-1">
+          <div className="text-[11px] text-slate-400 mt-1">
             Demand: {activeHourData.loadKw} kW
           </div>
         </div>

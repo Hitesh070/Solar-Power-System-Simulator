@@ -47,98 +47,96 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
       name: item.displayName.split(',').slice(0, 3).join(', '),
       latitude: item.lat,
       longitude: item.lon,
-      country: 'India',
     });
     setSearchResults([]);
     setSearchQuery('');
   };
 
-  // Recommended tilt for Indian latitude (Rule of thumb: Tilt ≈ Latitude)
-  const recommendedTilt = Math.max(10, Math.min(32, Math.round(location.latitude)));
+  const recommendedTilt = Math.max(10, Math.min(35, Math.round(location.latitude)));
 
   return (
-    <div className="bg-[#0f1422] border border-[#1e2638] rounded-2xl p-5 flex flex-col gap-4 shadow-xl">
+    <div className="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col gap-4 shadow-sm">
       {/* 1. Location & Interactive Map Pinpoint */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-            <MapPin className="w-3.5 h-3.5 text-amber-400" /> Rooftop Location
+          <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+            <MapPin className="w-3.5 h-3.5 text-amber-500" /> Geographic Location
           </label>
-          <span className="text-[11px] font-mono text-amber-400">
-            {location.latitude.toFixed(2)}°N, {location.longitude.toFixed(2)}°E
+          <span className="text-[11px] font-mono text-amber-700 font-semibold">
+            {location.latitude.toFixed(2)}°, {location.longitude.toFixed(2)}°
           </span>
         </div>
 
         {/* Search input with Map Pinpoint button */}
         <form onSubmit={handleSearch} className="relative flex gap-2">
           <div className="relative flex-1">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
-              placeholder="Search Indian city, pin code..."
+              placeholder="Search city, address..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#080c14] border border-[#1e2638] focus:border-amber-500 text-xs text-white pl-8 pr-3 py-2 rounded-xl focus:outline-none transition"
+              className="w-full bg-slate-50 border border-slate-200 focus:border-amber-500 text-xs text-slate-900 pl-8 pr-3 py-2 rounded-xl focus:outline-none transition focus:bg-white"
             />
           </div>
           <button
             type="submit"
             disabled={isSearching}
-            className="bg-[#121826] hover:bg-slate-800 text-slate-200 px-3 py-2 rounded-xl text-xs font-medium border border-[#1e2638] transition"
+            className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-xl text-xs font-semibold border border-slate-200 transition"
           >
             {isSearching ? '...' : 'Find'}
           </button>
           <button
             type="button"
             onClick={onOpenMap}
-            className="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shrink-0"
-            title="Open Interactive Map to pinpoint exact rooftop"
+            className="bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 px-3 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shrink-0 shadow-sm"
+            title="Open Interactive Map to pinpoint exact location"
           >
-            <Map className="w-3.5 h-3.5" />
+            <Map className="w-3.5 h-3.5 text-amber-600" />
             <span>Map Pin</span>
           </button>
         </form>
 
         {/* Autocomplete dropdown */}
         {searchResults.length > 0 && (
-          <div className="mt-2 bg-[#080c14] border border-[#1e2638] rounded-xl overflow-hidden shadow-2xl z-20">
+          <div className="mt-2 bg-white border border-slate-200 rounded-xl overflow-hidden shadow-lg z-20">
             {searchResults.map((item, idx) => (
               <button
                 key={idx}
                 type="button"
                 onClick={() => selectSearchResult(item)}
-                className="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-[#121826] hover:text-white border-b border-[#1e2638] last:border-b-0 transition flex items-center justify-between"
+                className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-900 border-b border-slate-100 last:border-b-0 transition flex items-center justify-between"
               >
                 <span className="truncate pr-2">{item.displayName}</span>
-                <Check className="w-3 h-3 text-amber-400 shrink-0" />
+                <Check className="w-3 h-3 text-amber-500 shrink-0" />
               </button>
             ))}
           </div>
         )}
 
         {/* Active location tag */}
-        <div className="mt-2 text-xs text-slate-400 bg-[#080c14] px-3 py-2 rounded-xl border border-[#1e2638] flex items-center justify-between">
-          <span className="font-medium text-white truncate">{location.name}</span>
+        <div className="mt-2 text-xs text-slate-600 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200 flex items-center justify-between">
+          <span className="font-semibold text-slate-900 truncate">{location.name}</span>
           <button
             onClick={onOpenMap}
-            className="text-[11px] text-amber-400 hover:underline shrink-0 ml-2"
+            className="text-[11px] text-amber-600 hover:underline font-semibold shrink-0 ml-2"
           >
             Change
           </button>
         </div>
       </div>
 
-      <div className="h-px bg-[#1e2638]" />
+      <div className="h-px bg-slate-100" />
 
       {/* 2. Solar PV Hardware Parameters */}
       <div>
         <button
           type="button"
           onClick={() => setActiveAccordion(activeAccordion === 'pv' ? null : 'pv')}
-          className="w-full flex items-center justify-between text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2"
+          className="w-full flex items-center justify-between text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2"
         >
           <span className="flex items-center gap-1.5">
-            <Zap className="w-3.5 h-3.5 text-amber-400" /> Photovoltaic System
+            <Zap className="w-3.5 h-3.5 text-amber-500" /> Photovoltaic System
           </span>
           {activeAccordion === 'pv' ? (
             <ChevronUp className="w-4 h-4 text-slate-400" />
@@ -152,8 +150,8 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
             {/* System DC Capacity */}
             <div>
               <div className="flex justify-between text-xs mb-1">
-                <span className="text-slate-400">System DC Capacity:</span>
-                <span className="font-mono font-bold text-amber-400">
+                <span className="text-slate-600 font-medium">System DC Capacity:</span>
+                <span className="font-mono font-bold text-amber-700">
                   {config.systemCapacityKw.toFixed(1)} kWp
                 </span>
               </div>
@@ -166,36 +164,36 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                 onChange={(e) =>
                   onUpdateConfig({ systemCapacityKw: parseFloat(e.target.value) })
                 }
-                className="w-full accent-amber-500 cursor-pointer h-1.5 bg-slate-800 rounded appearance-none"
+                className="w-full accent-amber-500 cursor-pointer h-1.5 bg-slate-200 rounded appearance-none"
               />
             </div>
 
             {/* Flat Terrace Tilt Angle */}
             <div>
               <div className="flex justify-between text-xs mb-1">
-                <span className="text-slate-400">Terrace Rack Tilt:</span>
-                <span className="font-mono font-bold text-sky-400">
-                  {config.panelTiltDeg}° (Opt: {recommendedTilt}°)
+                <span className="text-slate-600 font-medium">Panel Rack Tilt:</span>
+                <span className="font-mono font-bold text-sky-700">
+                  {config.panelTiltDeg}° (Optimal: {recommendedTilt}°)
                 </span>
               </div>
               <input
                 type="range"
                 min="5"
-                max="45"
+                max="50"
                 step="1"
                 value={config.panelTiltDeg}
                 onChange={(e) =>
                   onUpdateConfig({ panelTiltDeg: parseInt(e.target.value) })
                 }
-                className="w-full accent-sky-500 cursor-pointer h-1.5 bg-slate-800 rounded appearance-none"
+                className="w-full accent-sky-500 cursor-pointer h-1.5 bg-slate-200 rounded appearance-none"
               />
             </div>
 
             {/* Azimuth Slider */}
             <div>
               <div className="flex justify-between text-xs mb-1">
-                <span className="text-slate-400">Orientation (Azimuth):</span>
-                <span className="font-mono font-bold text-amber-400">
+                <span className="text-slate-600 font-medium">Panel Azimuth:</span>
+                <span className="font-mono font-bold text-amber-700">
                   {config.panelAzimuthDeg}° ({config.panelAzimuthDeg === 180 ? 'True South' : `${config.panelAzimuthDeg}°`})
                 </span>
               </div>
@@ -208,14 +206,14 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                 onChange={(e) =>
                   onUpdateConfig({ panelAzimuthDeg: parseInt(e.target.value) })
                 }
-                className="w-full accent-amber-500 cursor-pointer h-1.5 bg-slate-800 rounded appearance-none"
+                className="w-full accent-amber-500 cursor-pointer h-1.5 bg-slate-200 rounded appearance-none"
               />
             </div>
 
             {/* Inverter Capacity & Losses */}
             <div className="grid grid-cols-2 gap-2 pt-1">
               <div>
-                <label className="text-[11px] text-slate-400 block mb-1">
+                <label className="text-[11px] text-slate-500 block mb-1 font-medium">
                   Inverter AC (kW):
                 </label>
                 <input
@@ -227,12 +225,12 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                   onChange={(e) =>
                     onUpdateConfig({ inverterCapacityKw: parseFloat(e.target.value) || 1 })
                   }
-                  className="w-full bg-[#080c14] border border-[#1e2638] rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-amber-500 font-mono focus:bg-white"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] text-slate-400 block mb-1">
+                <label className="text-[11px] text-slate-500 block mb-1 font-medium">
                   System Losses (%):
                 </label>
                 <input
@@ -244,7 +242,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                   onChange={(e) =>
                     onUpdateConfig({ systemLossesPercent: parseFloat(e.target.value) || 14 })
                   }
-                  className="w-full bg-[#080c14] border border-[#1e2638] rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-amber-500 font-mono focus:bg-white"
                 />
               </div>
             </div>
@@ -252,17 +250,17 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
         )}
       </div>
 
-      <div className="h-px bg-[#1e2638]" />
+      <div className="h-px bg-slate-100" />
 
       {/* 3. Battery Storage System (BESS) */}
       <div>
         <button
           type="button"
           onClick={() => setActiveAccordion(activeAccordion === 'battery' ? null : 'battery')}
-          className="w-full flex items-center justify-between text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2"
+          className="w-full flex items-center justify-between text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2"
         >
           <span className="flex items-center gap-1.5">
-            <Battery className="w-3.5 h-3.5 text-emerald-400" /> Battery Storage (Optional)
+            <Battery className="w-3.5 h-3.5 text-emerald-600" /> Battery Storage (Optional)
           </span>
           {activeAccordion === 'battery' ? (
             <ChevronUp className="w-4 h-4 text-slate-400" />
@@ -273,15 +271,15 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
 
         {activeAccordion === 'battery' && (
           <div className="flex flex-col gap-3 pt-1">
-            <label className="flex items-center gap-2 cursor-pointer bg-[#080c14] p-2.5 rounded-xl border border-[#1e2638]">
+            <label className="flex items-center gap-2 cursor-pointer bg-slate-50 p-2.5 rounded-xl border border-slate-200 hover:bg-slate-100/60 transition">
               <input
                 type="checkbox"
                 checked={config.hasBattery}
                 onChange={(e) => onUpdateConfig({ hasBattery: e.target.checked })}
-                className="w-4 h-4 accent-emerald-500 rounded"
+                className="w-4 h-4 accent-emerald-600 rounded"
               />
-              <span className="text-xs text-slate-200 font-medium">
-                Include Lithium Battery Storage
+              <span className="text-xs text-slate-800 font-medium">
+                Include Battery Storage Bank
               </span>
             </label>
 
@@ -289,8 +287,8 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
               <>
                 <div>
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="text-slate-400">Battery Capacity:</span>
-                    <span className="font-mono font-bold text-emerald-400">
+                    <span className="text-slate-600 font-medium">Battery Capacity:</span>
+                    <span className="font-mono font-bold text-emerald-700">
                       {config.batteryCapacityKwh.toFixed(1)} kWh
                     </span>
                   </div>
@@ -303,13 +301,13 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                     onChange={(e) =>
                       onUpdateConfig({ batteryCapacityKwh: parseFloat(e.target.value) })
                     }
-                    className="w-full accent-emerald-500 cursor-pointer h-1.5 bg-slate-800 rounded appearance-none"
+                    className="w-full accent-emerald-600 cursor-pointer h-1.5 bg-slate-200 rounded appearance-none"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[11px] text-slate-400 block mb-1">
+                    <label className="text-[11px] text-slate-500 block mb-1 font-medium">
                       Max Output (kW):
                     </label>
                     <input
@@ -321,11 +319,11 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                       onChange={(e) =>
                         onUpdateConfig({ batteryMaxPowerKw: parseFloat(e.target.value) || 3 })
                       }
-                      className="w-full bg-[#080c14] border border-[#1e2638] rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500 font-mono"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-emerald-600 font-mono focus:bg-white"
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] text-slate-400 block mb-1">
+                    <label className="text-[11px] text-slate-500 block mb-1 font-medium">
                       Min Reserve (%):
                     </label>
                     <input
@@ -337,7 +335,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                       onChange={(e) =>
                         onUpdateConfig({ batteryMinSocPercent: parseInt(e.target.value) || 15 })
                       }
-                      className="w-full bg-[#080c14] border border-[#1e2638] rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500 font-mono"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-emerald-600 font-mono focus:bg-white"
                     />
                   </div>
                 </div>
@@ -347,17 +345,17 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
         )}
       </div>
 
-      <div className="h-px bg-[#1e2638]" />
+      <div className="h-px bg-slate-100" />
 
-      {/* 4. DISCOM Tariffs & System Cost (INR) */}
+      {/* 4. Tariffs & System Cost */}
       <div>
         <button
           type="button"
           onClick={() => setActiveAccordion(activeAccordion === 'econ' ? null : 'econ')}
-          className="w-full flex items-center justify-between text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2"
+          className="w-full flex items-center justify-between text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2"
         >
           <span className="flex items-center gap-1.5">
-            <IndianRupee className="w-3.5 h-3.5 text-amber-400" /> Discom Tariffs & Cost (₹)
+            <IndianRupee className="w-3.5 h-3.5 text-amber-500" /> Tariffs & Economics
           </span>
           {activeAccordion === 'econ' ? (
             <ChevronUp className="w-4 h-4 text-slate-400" />
@@ -368,12 +366,12 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
 
         {activeAccordion === 'econ' && (
           <div className="flex flex-col gap-3 pt-1">
-            {/* Daily Consumption in units */}
+            {/* Daily Consumption */}
             <div>
               <div className="flex justify-between text-xs mb-1">
-                <span className="text-slate-400">Daily Demand (Units / day):</span>
-                <span className="font-mono font-bold text-purple-400">
-                  {config.dailyConsumptionKwh} kWh
+                <span className="text-slate-600 font-medium">Daily Demand:</span>
+                <span className="font-mono font-bold text-purple-700">
+                  {config.dailyConsumptionKwh} kWh / day
                 </span>
               </div>
               <input
@@ -385,16 +383,16 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                 onChange={(e) =>
                   onUpdateConfig({ dailyConsumptionKwh: parseFloat(e.target.value) })
                 }
-                className="w-full accent-purple-500 cursor-pointer h-1.5 bg-slate-800 rounded appearance-none"
+                className="w-full accent-purple-600 cursor-pointer h-1.5 bg-slate-200 rounded appearance-none"
               />
-              <span className="text-[10px] text-slate-500 block mt-0.5">
+              <span className="text-[10px] text-slate-400 block mt-0.5">
                 ~{Math.round(config.dailyConsumptionKwh * 30)} units / month
               </span>
             </div>
 
             {/* Load Profile Type */}
             <div>
-              <label className="text-[11px] text-slate-400 block mb-1">
+              <label className="text-[11px] text-slate-500 block mb-1 font-medium">
                 Usage Pattern:
               </label>
               <select
@@ -404,19 +402,19 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                     loadProfileType: e.target.value as PVSystemConfig['loadProfileType'],
                   })
                 }
-                className="w-full bg-[#080c14] border border-[#1e2638] rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-amber-500"
               >
                 <option value="residential">Residential (Morning & Evening Peak)</option>
-                <option value="evening-heavy">Evening-Heavy (AC / Late night)</option>
+                <option value="evening-heavy">Evening-Heavy (AC / Night load)</option>
                 <option value="commercial">Commercial (Daytime 9am - 6pm)</option>
                 <option value="flat">Flat / Constant Industrial Base</option>
               </select>
             </div>
 
-            {/* Indian Tariffs in INR */}
+            {/* Tariffs */}
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[11px] text-slate-400 block mb-1">
+                <label className="text-[11px] text-slate-500 block mb-1 font-medium">
                   Grid Tariff (₹/unit):
                 </label>
                 <input
@@ -430,13 +428,13 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                       gridElectricityRateInr: parseFloat(e.target.value) || 7.5,
                     })
                   }
-                  className="w-full bg-[#080c14] border border-[#1e2638] rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-amber-500 font-mono focus:bg-white"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] text-slate-400 block mb-1">
-                  Export Tariff (₹/unit):
+                <label className="text-[11px] text-slate-500 block mb-1 font-medium">
+                  Export Credit (₹/unit):
                 </label>
                 <input
                   type="number"
@@ -449,18 +447,18 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                       feedInTariffInr: parseFloat(e.target.value) || 3.0,
                     })
                   }
-                  className="w-full bg-[#080c14] border border-[#1e2638] rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-amber-500 font-mono focus:bg-white"
                 />
               </div>
             </div>
 
-            {/* System Cost in INR */}
+            {/* System Cost */}
             <div>
               <div className="flex justify-between items-center mb-1">
-                <label className="text-[11px] text-slate-400">
-                  Total System Capex (₹):
+                <label className="text-[11px] text-slate-500 font-medium">
+                  Turnkey System Cost (₹):
                 </label>
-                <span className="text-[11px] font-mono text-amber-400">
+                <span className="text-[11px] font-mono text-amber-700 font-bold">
                   ₹{(config.systemCostInr / 100000).toFixed(2)} Lakh
                 </span>
               </div>
@@ -473,11 +471,8 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                 onChange={(e) =>
                   onUpdateConfig({ systemCostInr: parseFloat(e.target.value) || 150000 })
                 }
-                className="w-full bg-[#080c14] border border-[#1e2638] rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-amber-500 font-mono focus:bg-white"
               />
-              <span className="text-[10px] text-slate-500 block mt-0.5">
-                Typical ₹50,000 - ₹65,000 / kWp in India (before subsidy)
-              </span>
             </div>
           </div>
         )}

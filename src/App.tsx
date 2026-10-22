@@ -28,7 +28,7 @@ import { MapPickerModal } from './components/MapPickerModal';
 type ActiveTab = 'overview' | '3d' | 'hourly' | 'monthly' | 'financials' | 'specs';
 
 export function App() {
-  const defaultPreset = PRESETS[0]; // Bengaluru Villa Terrace (3 kWp)
+  const defaultPreset = PRESETS[0];
 
   const [location, setLocation] = useState<LocationData>(defaultPreset.location);
   const [config, setConfig] = useState<PVSystemConfig>(defaultPreset.config);
@@ -39,7 +39,6 @@ export function App() {
   const [isMapOpen, setIsMapOpen] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // Run simulation engine
   const executeSimulation = useCallback(
     async (loc: LocationData, cfg: PVSystemConfig) => {
       setIsLoading(true);
@@ -57,7 +56,6 @@ export function App() {
     []
   );
 
-  // Initial simulation run on component mount
   useEffect(() => {
     executeSimulation(location, config);
   }, [executeSimulation, location, config]);
@@ -82,7 +80,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#080c14] text-[#e2e8f0] flex flex-col font-sans selection:bg-amber-500 selection:text-black">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-amber-500 selection:text-white">
       {/* Top Navigation Bar */}
       <Navbar
         onSelectPreset={handleSelectPreset}
@@ -106,16 +104,16 @@ export function App() {
           />
         </aside>
 
-        {/* Right Column: Simulation Dashboards & Visualizations */}
+        {/* Right Column: Dashboards & Visualizations */}
         <div className="lg:col-span-8 xl:col-span-9 flex flex-col gap-4">
           {/* Tab Navigation Segmented Bar */}
-          <div className="bg-[#0f1422] border border-[#1e2638] p-1 rounded-xl flex items-center gap-1 overflow-x-auto shadow-md">
+          <div className="bg-white border border-slate-200 p-1 rounded-xl flex items-center gap-1 overflow-x-auto shadow-sm">
             <button
               onClick={() => setActiveTab('overview')}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap ${
                 activeTab === 'overview'
-                  ? 'bg-amber-500 text-slate-950 font-bold'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                  ? 'bg-amber-500 text-white font-bold shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
               <LayoutDashboard className="w-3.5 h-3.5" />
@@ -126,8 +124,8 @@ export function App() {
               onClick={() => setActiveTab('3d')}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap ${
                 activeTab === '3d'
-                  ? 'bg-amber-500 text-slate-950 font-bold'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                  ? 'bg-amber-500 text-white font-bold shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
               <Box className="w-3.5 h-3.5" />
@@ -138,8 +136,8 @@ export function App() {
               onClick={() => setActiveTab('hourly')}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap ${
                 activeTab === 'hourly'
-                  ? 'bg-amber-500 text-slate-950 font-bold'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                  ? 'bg-amber-500 text-white font-bold shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
               <Clock className="w-3.5 h-3.5" />
@@ -150,8 +148,8 @@ export function App() {
               onClick={() => setActiveTab('monthly')}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap ${
                 activeTab === 'monthly'
-                  ? 'bg-amber-500 text-slate-950 font-bold'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                  ? 'bg-amber-500 text-white font-bold shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
               <BarChart3 className="w-3.5 h-3.5" />
@@ -162,20 +160,20 @@ export function App() {
               onClick={() => setActiveTab('financials')}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap ${
                 activeTab === 'financials'
-                  ? 'bg-amber-500 text-slate-950 font-bold'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                  ? 'bg-amber-500 text-white font-bold shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
               <IndianRupee className="w-3.5 h-3.5" />
-              <span>Discom Financials (₹)</span>
+              <span>Financials (ROI)</span>
             </button>
 
             <button
               onClick={() => setActiveTab('specs')}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap ${
                 activeTab === 'specs'
-                  ? 'bg-amber-500 text-slate-950 font-bold'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                  ? 'bg-amber-500 text-white font-bold shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
               <Cpu className="w-3.5 h-3.5" />
@@ -185,8 +183,8 @@ export function App() {
 
           {/* Error Message if any */}
           {errorMsg && (
-            <div className="bg-rose-500/10 border border-rose-500/20 text-rose-300 p-3.5 rounded-xl flex items-center gap-2.5 text-xs">
-              <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+            <div className="bg-rose-50 border border-rose-200 text-rose-700 p-3.5 rounded-xl flex items-center gap-2.5 text-xs">
+              <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
               <span>{errorMsg}</span>
             </div>
           )}
@@ -198,13 +196,13 @@ export function App() {
 
               {activeTab === '3d' && (
                 <div className="flex flex-col gap-3">
-                  <div className="bg-[#0f1422] border border-[#1e2638] rounded-xl px-4 py-2.5 text-xs text-slate-300 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <span className="flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-amber-400" />
+                  <div className="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-sm">
+                    <span className="flex items-center gap-1.5 font-medium">
+                      <MapPin className="w-3.5 h-3.5 text-amber-500" />
                       Flat Concrete Terrace Rooftop Simulation for {location.name}
                     </span>
-                    <span className="font-mono text-amber-400 font-bold text-[11px]">
-                      Elevated Rack Tilt: {config.panelTiltDeg}° | Facing: True South ({config.panelAzimuthDeg}°)
+                    <span className="font-mono text-amber-700 font-bold text-[11px] bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                      Tilt: {config.panelTiltDeg}° | Facing: True South ({config.panelAzimuthDeg}°)
                     </span>
                   </div>
                   <ThreeSolarScene
@@ -226,11 +224,11 @@ export function App() {
               {activeTab === 'specs' && <SystemSpecsTab results={results} />}
             </div>
           ) : (
-            <div className="bg-[#0f1422] border border-[#1e2638] rounded-2xl p-16 flex flex-col items-center justify-center text-center">
-              <Sun className="w-10 h-10 text-amber-400 animate-spin mb-3" />
-              <h3 className="text-sm font-bold text-white">Running Solar Physics Model...</h3>
-              <p className="text-xs text-slate-400 mt-1 max-w-md">
-                Computing astronomical solar positions, Hay-Davies plane of array transposition, and Indian Discom tariff calculations.
+            <div className="bg-white border border-slate-200 rounded-2xl p-16 flex flex-col items-center justify-center text-center shadow-sm">
+              <Sun className="w-10 h-10 text-amber-500 animate-spin mb-3" />
+              <h3 className="text-sm font-bold text-slate-900">Running Solar Physics Model...</h3>
+              <p className="text-xs text-slate-500 mt-1 max-w-md">
+                Computing astronomical solar positions, Hay-Davies plane of array transposition, and financial calculations.
               </p>
             </div>
           )}
@@ -243,7 +241,7 @@ export function App() {
         onClose={() => setIsEducationOpen(false)}
       />
 
-      {/* Interactive Leaflet Map Picker Modal */}
+      {/* Interactive Map Picker Modal */}
       <MapPickerModal
         isOpen={isMapOpen}
         initialLocation={location}
@@ -252,10 +250,10 @@ export function App() {
       />
 
       {/* Footer */}
-      <footer className="mt-auto border-t border-[#1e2638] bg-[#080c14] px-6 py-3.5 text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <footer className="mt-auto border-t border-slate-200 bg-white px-6 py-3.5 text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <Sun className="w-3.5 h-3.5 text-amber-400" />
-          <span>HeliosPV • Solar Power System Simulator (India)</span>
+          <Sun className="w-3.5 h-3.5 text-amber-500" />
+          <span>HeliosPV • Solar Power System Simulator</span>
           <span>•</span>
           <span>Open-Meteo & NREL Reference Models</span>
         </div>
@@ -264,9 +262,9 @@ export function App() {
             href="https://github.com/Hitesh070/Solar-Power-System-Simulator"
             target="_blank"
             rel="noreferrer"
-            className="text-slate-400 hover:text-white transition flex items-center gap-1.5 font-medium"
+            className="text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5 font-medium"
           >
-            <Github className="w-3.5 h-3.5" />
+            <Github className="w-4 h-4" />
             <span>GitHub Repository</span>
           </a>
         </div>
