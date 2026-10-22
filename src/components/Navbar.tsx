@@ -1,11 +1,12 @@
 import React from 'react';
-import { Sun, Download, BookOpen, Layers, RefreshCw } from 'lucide-react';
+import { Sun, Download, BookOpen, Layers, RefreshCw, MapPin } from 'lucide-react';
 import { PRESETS, SystemPreset } from '../lib/mock-presets';
 import { CompleteSimulationResults } from '../types/solar';
 
 interface NavbarProps {
   onSelectPreset: (preset: SystemPreset) => void;
   onOpenEducation: () => void;
+  onOpenMap: () => void;
   simulationResults: CompleteSimulationResults | null;
   isLoading: boolean;
   onRefresh: () => void;
@@ -14,6 +15,7 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({
   onSelectPreset,
   onOpenEducation,
+  onOpenMap,
   simulationResults,
   isLoading,
   onRefresh,
@@ -28,7 +30,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     downloadAnchor.setAttribute('href', dataStr);
     downloadAnchor.setAttribute(
       'download',
-      `HeliosPV_Simulation_${simulationResults.location.name.replace(/[^a-zA-Z0-9]/g, '_')}.json`
+      `HeliosPV_Solar_Report_${simulationResults.location.name.replace(/[^a-zA-Z0-9]/g, '_')}.json`
     );
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
@@ -36,80 +38,90 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/80 px-4 lg:px-8 py-3.5 flex items-center justify-between gap-4">
+    <header className="sticky top-0 z-40 bg-[#080c14]/90 backdrop-blur-md border-b border-[#1e2638] px-4 lg:px-8 py-3 flex items-center justify-between gap-4">
       {/* Brand & Logo */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 via-amber-400 to-yellow-300 flex items-center justify-center shadow-lg shadow-amber-500/20 text-slate-950 font-black">
-          <Sun className="w-6 h-6 animate-[spin_12s_linear_infinite]" />
+        <div className="w-9 h-9 rounded-xl bg-amber-500 flex items-center justify-center text-slate-950 font-bold shadow-md shadow-amber-500/20">
+          <Sun className="w-5 h-5 fill-current" />
         </div>
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-lg font-extrabold tracking-tight text-white flex items-center gap-1.5">
+            <h1 className="text-base font-bold tracking-tight text-white flex items-center gap-1">
               Helios<span className="text-amber-400">PV</span>
             </h1>
-            <span className="bg-amber-400/10 text-amber-400 border border-amber-400/20 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-              Simulator v1.0
+            <span className="bg-[#121826] text-amber-400 border border-[#1e2638] text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+              India Edition
             </span>
           </div>
-          <p className="text-xs text-slate-400 hidden sm:block">
-            Physics-Grade Photovoltaic & Energy Storage Model
+          <p className="text-[11px] text-slate-400 hidden sm:block">
+            Photovoltaic Flat Rooftop Simulator & Discom Net-Metering
           </p>
         </div>
       </div>
 
-      {/* Center / Action Buttons */}
-      <div className="flex items-center gap-2.5">
+      {/* Action Buttons */}
+      <div className="flex items-center gap-2">
         {/* Preset Selector Dropdown */}
-        <div className="relative hidden md:flex items-center gap-2">
-          <Layers className="w-4 h-4 text-slate-400" />
+        <div className="relative hidden md:flex items-center gap-1.5">
+          <Layers className="w-3.5 h-3.5 text-slate-400" />
           <select
             onChange={(e) => {
               const selected = PRESETS.find((p) => p.id === e.target.value);
               if (selected) onSelectPreset(selected);
             }}
             defaultValue=""
-            className="bg-slate-900 border border-slate-800 hover:border-slate-700 text-xs text-slate-200 rounded-xl px-3 py-2 font-medium focus:outline-none focus:border-amber-500 transition cursor-pointer"
+            className="bg-[#0f1422] border border-[#1e2638] hover:border-slate-700 text-xs text-slate-200 rounded-xl px-3 py-1.5 font-medium focus:outline-none focus:border-amber-500 transition cursor-pointer"
           >
             <option value="" disabled>
-              Load Benchmark Preset...
+              Load Benchmark City...
             </option>
             {PRESETS.map((preset) => (
               <option key={preset.id} value={preset.id}>
-                {preset.name} ({preset.badge})
+                {preset.name}
               </option>
             ))}
           </select>
         </div>
 
-        {/* Education & Physics Theory Button */}
+        {/* Map Pinpoint Trigger */}
+        <button
+          onClick={onOpenMap}
+          className="flex items-center gap-1.5 bg-[#0f1422] hover:bg-[#121826] border border-[#1e2638] text-slate-300 hover:text-white px-3 py-1.5 rounded-xl text-xs font-medium transition"
+          title="Interactive Map Pinpoint"
+        >
+          <MapPin className="w-3.5 h-3.5 text-amber-400" />
+          <span className="hidden sm:inline">Map</span>
+        </button>
+
+        {/* Physics Theory */}
         <button
           onClick={onOpenEducation}
-          className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white px-3 py-2 rounded-xl text-xs font-semibold transition"
-          title="Learn the Solar Physics & Equations"
+          className="flex items-center gap-1.5 bg-[#0f1422] hover:bg-[#121826] border border-[#1e2638] text-slate-300 hover:text-white px-3 py-1.5 rounded-xl text-xs font-medium transition"
+          title="Learn the Solar Physics & Formulas"
         >
-          <BookOpen className="w-4 h-4 text-amber-400" />
-          <span className="hidden sm:inline">Physics Theory</span>
+          <BookOpen className="w-3.5 h-3.5 text-slate-400" />
+          <span className="hidden sm:inline">Physics</span>
         </button>
 
         {/* Export JSON Report */}
         <button
           onClick={exportSimulationData}
           disabled={!simulationResults}
-          className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white px-3 py-2 rounded-xl text-xs font-semibold transition"
+          className="flex items-center gap-1.5 bg-[#0f1422] hover:bg-[#121826] disabled:opacity-50 border border-[#1e2638] text-slate-300 hover:text-white px-3 py-1.5 rounded-xl text-xs font-medium transition"
           title="Export Simulation JSON"
         >
-          <Download className="w-4 h-4 text-sky-400" />
+          <Download className="w-3.5 h-3.5 text-slate-400" />
           <span className="hidden sm:inline">Export</span>
         </button>
 
-        {/* Re-simulate Button */}
+        {/* Run Simulation */}
         <button
           onClick={onRefresh}
           disabled={isLoading}
-          className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold px-3.5 py-2 rounded-xl text-xs transition shadow-md shadow-amber-500/20 active:scale-95 disabled:opacity-50"
+          className="flex items-center gap-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3.5 py-1.5 rounded-xl text-xs transition active:scale-95 disabled:opacity-50"
         >
-          <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-          <span>{isLoading ? 'Simulating...' : 'Run Simulation'}</span>
+          <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+          <span>{isLoading ? 'Simulating...' : 'Simulate'}</span>
         </button>
       </div>
     </header>

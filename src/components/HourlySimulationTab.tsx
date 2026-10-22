@@ -11,7 +11,6 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
   const [selectedDayIndex, setSelectedDayIndex] = useState<number>(0);
   const [hoveredHour, setHoveredHour] = useState<number | null>(null);
 
-  // Group hours by 24-hour days
   const totalDays = Math.max(1, Math.floor(hourly.length / 24));
   const currentDayHours: HourlySimulationResult[] = hourly.slice(
     selectedDayIndex * 24,
@@ -23,23 +22,22 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
       ? currentDayHours[hoveredHour]
       : currentDayHours[12] || currentDayHours[0];
 
-  // Peak metrics for scaling charts
   const maxSolarPower = Math.max(1, ...currentDayHours.map((h) => h.solarAcPowerKw));
   const maxLoad = Math.max(1, ...currentDayHours.map((h) => h.loadKw));
   const maxChartPower = Math.max(maxSolarPower, maxLoad) * 1.15;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
       {/* Day Selector Header */}
-      <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="bg-[#0f1422] border border-[#1e2638] rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-amber-500/10 text-amber-400 rounded-xl">
+          <div className="p-2 bg-amber-500/10 text-amber-400 rounded-lg">
             <Clock className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-white">24-Hour Diurnal Dispatch Profile</h3>
+            <h3 className="text-sm font-bold text-white">24-Hour Diurnal Power Profile</h3>
             <p className="text-xs text-slate-400">
-              Interactive hourly energy balance between PV array, battery, household load, and grid.
+              Interactive hourly energy balance between solar PV array, battery, household load, and Discom grid.
             </p>
           </div>
         </div>
@@ -57,40 +55,38 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
             onChange={(e) => setSelectedDayIndex(parseInt(e.target.value))}
             className="w-32 accent-amber-500 cursor-pointer h-1.5 bg-slate-800 rounded"
           />
-          <span className="text-xs font-mono font-bold text-amber-400 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800">
+          <span className="text-xs font-mono font-bold text-amber-400 bg-[#080c14] px-2.5 py-1 rounded-lg border border-[#1e2638]">
             {currentDayHours[0]?.datetime.split('T')[0] || `Day ${selectedDayIndex + 1}`}
           </span>
         </div>
       </div>
 
-      {/* Main Interactive Hourly Chart (Custom SVG Vector Renderer for ultra-fluid performance) */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col gap-4">
-        {/* Chart Legend */}
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-3">
+      {/* Main Hourly Chart */}
+      <div className="bg-[#0f1422] border border-[#1e2638] rounded-2xl p-6 shadow-xl flex flex-col gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#1e2638] pb-3">
           <div className="flex items-center gap-4 text-xs font-medium">
             <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-amber-400" />
-              <span className="text-slate-300">Solar AC Output (kW)</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+              <span className="text-slate-300">Solar AC (kW)</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-purple-400" />
+              <span className="w-2.5 h-2.5 rounded-full bg-purple-400" />
               <span className="text-slate-300">Demand Load (kW)</span>
             </div>
             {config.hasBattery && (
               <div className="flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded-full bg-emerald-400" />
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
                 <span className="text-slate-300">Battery SoC (%)</span>
               </div>
             )}
             <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-sky-400" />
-              <span className="text-slate-300">Grid Export (kW)</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-sky-400" />
+              <span className="text-slate-300">Discom Export (kW)</span>
             </div>
           </div>
 
-          {/* Real-time Hovered Stat */}
           {activeHourData && (
-            <div className="text-xs bg-slate-950 px-3 py-1 rounded-xl border border-slate-800 flex items-center gap-2">
+            <div className="text-xs bg-[#080c14] px-3 py-1 rounded-xl border border-[#1e2638] flex items-center gap-2">
               <span className="text-slate-400">Hour {activeHourData.hour}:00</span>
               <span className="text-amber-400 font-mono font-bold">
                 PV: {activeHourData.solarAcPowerKw} kW
@@ -114,7 +110,6 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
             className="w-full h-full overflow-visible"
             preserveAspectRatio="none"
           >
-            {/* Horizontal Grid lines */}
             {[0, 0.25, 0.5, 0.75, 1.0].map((ratio, idx) => {
               const y = 220 - ratio * 190;
               const kwVal = (maxChartPower * ratio).toFixed(1);
@@ -125,7 +120,7 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
                     y1={y}
                     x2="780"
                     y2={y}
-                    stroke="#1e293b"
+                    stroke="#161e30"
                     strokeDasharray="4 4"
                     strokeWidth="1"
                   />
@@ -157,17 +152,17 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
                 <g>
                   <defs>
                     <linearGradient id="solarGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.45" />
+                      <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.35" />
                       <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.0" />
                     </linearGradient>
                   </defs>
                   <path d={areaPath} fill="url(#solarGradient)" />
-                  <path d={linePath} fill="none" stroke="#fbbf24" strokeWidth="2.5" />
+                  <path d={linePath} fill="none" stroke="#f59e0b" strokeWidth="2.5" />
                 </g>
               );
             })()}
 
-            {/* Demand Load Line Curve */}
+            {/* Demand Load Curve */}
             {(() => {
               const points = currentDayHours.map((h, i) => {
                 const x = 50 + (i / 23) * 720;
@@ -179,13 +174,13 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
                   d={`M ${points.join(' L ')}`}
                   fill="none"
                   stroke="#c084fc"
-                  strokeWidth="2.5"
-                  strokeDasharray="6 3"
+                  strokeWidth="2.2"
+                  strokeDasharray="5 3"
                 />
               );
             })()}
 
-            {/* Battery SoC Curve (Right Y-axis 0-100%) */}
+            {/* Battery SoC Curve */}
             {config.hasBattery &&
               (() => {
                 const points = currentDayHours.map((h, i) => {
@@ -197,7 +192,7 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
                   <path
                     d={`M ${points.join(' L ')}`}
                     fill="none"
-                    stroke="#34d399"
+                    stroke="#10b981"
                     strokeWidth="2"
                   />
                 );
@@ -223,12 +218,12 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
                 <g key={i}>
                   {i % 3 === 0 && (
                     <>
-                      <line x1={x} y1="220" x2={x} y2="225" stroke="#475569" strokeWidth="1" />
+                      <line x1={x} y1="220" x2={x} y2="225" stroke="#334155" strokeWidth="1" />
                       <text
                         x={x}
                         y="237"
                         textAnchor="middle"
-                        fill="#94a3b8"
+                        fill="#64748b"
                         fontSize="9"
                         fontFamily="monospace"
                       >
@@ -236,7 +231,6 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
                       </text>
                     </>
                   )}
-                  {/* Invisible hit box for hovering */}
                   <rect
                     x={x - 15}
                     y="20"
@@ -254,9 +248,9 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
         </div>
       </div>
 
-      {/* Hourly Detail Cards Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4">
+      {/* Hourly Detail Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="bg-[#0f1422] border border-[#1e2638] rounded-xl p-4">
           <div className="text-xs text-slate-400 mb-1">POA Irradiance:</div>
           <div className="text-xl font-bold font-mono text-amber-400">
             {activeHourData.poaIrradianceW} W/m²
@@ -266,18 +260,18 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
           </div>
         </div>
 
-        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4">
+        <div className="bg-[#0f1422] border border-[#1e2638] rounded-xl p-4">
           <div className="text-xs text-slate-400 mb-1">Direct Solar Used:</div>
           <div className="text-xl font-bold font-mono text-emerald-400">
             {activeHourData.directSolarUsedKw} kW
           </div>
           <div className="text-[11px] text-slate-500 mt-1">
-            AC Solar: {activeHourData.solarAcPowerKw} kW
+            AC Output: {activeHourData.solarAcPowerKw} kW
           </div>
         </div>
 
-        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4">
-          <div className="text-xs text-slate-400 mb-1">Battery Power:</div>
+        <div className="bg-[#0f1422] border border-[#1e2638] rounded-xl p-4">
+          <div className="text-xs text-slate-400 mb-1">Battery Storage:</div>
           <div className="text-xl font-bold font-mono text-sky-400">
             {activeHourData.batteryChargeKw > 0
               ? `+${activeHourData.batteryChargeKw} kW (Chg)`
@@ -290,14 +284,14 @@ export const HourlySimulationTab: React.FC<HourlySimulationTabProps> = ({ result
           </div>
         </div>
 
-        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4">
-          <div className="text-xs text-slate-400 mb-1">Grid Interaction:</div>
+        <div className="bg-[#0f1422] border border-[#1e2638] rounded-xl p-4">
+          <div className="text-xs text-slate-400 mb-1">Discom Grid:</div>
           <div className="text-xl font-bold font-mono text-purple-400">
             {activeHourData.gridExportKw > 0
               ? `+${activeHourData.gridExportKw} kW Export`
               : activeHourData.gridImportKw > 0
               ? `-${activeHourData.gridImportKw} kW Import`
-              : 'Zero Net Grid'}
+              : 'Zero Net'}
           </div>
           <div className="text-[11px] text-slate-500 mt-1">
             Demand: {activeHourData.loadKw} kW

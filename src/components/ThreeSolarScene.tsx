@@ -19,8 +19,8 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
   systemCapacityKw,
 }) => {
   const mountRef = useRef<HTMLDivElement>(null);
-  const [selectedHour, setSelectedHour] = useState<number>(13.5); // 1:30 PM
-  const [selectedMonth, setSelectedMonth] = useState<number>(6); // June
+  const [selectedHour, setSelectedHour] = useState<number>(12.5); // 12:30 PM (Indian Solar Noon)
+  const [selectedMonth, setSelectedMonth] = useState<number>(4); // April (Peak Indian Summer)
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [cameraView, setCameraView] = useState<'iso' | 'top' | 'front' | 'solar'>('iso');
 
@@ -36,8 +36,8 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
   const isDraggingRef = useRef<boolean>(false);
   const prevMousePosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const cameraThetaRef = useRef<number>(Math.PI / 4);
-  const cameraPhiRef = useRef<number>(Math.PI / 3.5);
-  const cameraRadiusRef = useRef<number>(24);
+  const cameraPhiRef = useRef<number>(Math.PI / 3.4);
+  const cameraRadiusRef = useRef<number>(25);
 
   // Solar position calculation for current hour and month
   const testDate = new Date(Date.UTC(2026, selectedMonth - 1, 21, Math.floor(selectedHour), (selectedHour % 1) * 60));
@@ -57,7 +57,7 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
     cameraRef.current.position.x = r * Math.sin(phi) * Math.sin(theta);
     cameraRef.current.position.y = r * Math.cos(phi);
     cameraRef.current.position.z = r * Math.sin(phi) * Math.cos(theta);
-    cameraRef.current.lookAt(0, 3.5, 0);
+    cameraRef.current.lookAt(0, 3.8, 0);
   };
 
   // Initialize Three.js scene
@@ -66,12 +66,12 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
     if (!container) return;
 
     const width = container.clientWidth;
-    const height = container.clientHeight || 450;
+    const height = container.clientHeight || 460;
 
     // 1. Scene setup
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color('#030712'); // Slate 950
-    scene.fog = new THREE.FogExp2('#030712', 0.015);
+    scene.background = new THREE.Color('#070a12');
+    scene.fog = new THREE.FogExp2('#070a12', 0.012);
     sceneRef.current = scene;
 
     // 2. Camera setup
@@ -80,22 +80,22 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
     updateCameraPosition();
 
     // 3. Renderer setup
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.1;
+    renderer.toneMappingExposure = 1.05;
     container.innerHTML = '';
     container.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
     // 4. Lights
-    const ambientLight = new THREE.AmbientLight('#94a3b8', 0.4);
+    const ambientLight = new THREE.AmbientLight('#94a3b8', 0.45);
     scene.add(ambientLight);
 
-    const hemiLight = new THREE.HemisphereLight('#38bdf8', '#1e293b', 0.35);
+    const hemiLight = new THREE.HemisphereLight('#60a5fa', '#0f172a', 0.4);
     scene.add(hemiLight);
 
     // Directional Sun Light
@@ -109,7 +109,7 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
     sunLight.shadow.camera.right = 16;
     sunLight.shadow.camera.top = 16;
     sunLight.shadow.camera.bottom = -16;
-    sunLight.shadow.bias = -0.0005;
+    sunLight.shadow.bias = -0.0004;
     scene.add(sunLight);
     sunLightRef.current = sunLight;
 
@@ -131,11 +131,11 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
     const sunGlow = new THREE.Mesh(sunGlowGeo, sunGlowMat);
     sunMesh.add(sunGlow);
 
-    // 5. Environment & Ground Grid
+    // 5. Ground Plane
     const groundGeo = new THREE.PlaneGeometry(80, 80);
     const groundMat = new THREE.MeshStandardMaterial({
-      color: '#0f172a',
-      roughness: 0.85,
+      color: '#0b0f19',
+      roughness: 0.9,
       metalness: 0.1,
     });
     const ground = new THREE.Mesh(groundGeo, groundMat);
@@ -144,22 +144,21 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
     ground.receiveShadow = true;
     scene.add(ground);
 
-    // Compass ring & grid helper
-    const grid = new THREE.GridHelper(50, 50, '#334155', '#1e293b');
+    const grid = new THREE.GridHelper(50, 50, '#1e2638', '#111726');
     grid.position.y = 0.01;
     scene.add(grid);
 
-    // Compass markings: North (+Z), South (-Z), East (+X), West (-X)
+    // Compass markers (N, S, E, W)
     addCompassMarkers(scene);
 
-    // 6. House Architecture
-    buildModernHouse(scene);
+    // 6. Modern Flat Terrace Building (No slanting roof)
+    buildFlatTerraceBuilding(scene);
 
-    // 7. Roof Panels Array Group
+    // 7. Elevated Flat Terrace Solar Panels Mount
     const panelsGroup = new THREE.Group();
     scene.add(panelsGroup);
     roofPanelsGroupRef.current = panelsGroup;
-    updateRoofPanels(panelsGroup, panelTiltDeg, panelAzimuthDeg, systemCapacityKw);
+    updateElevatedTerracePanels(panelsGroup, panelTiltDeg, panelAzimuthDeg, systemCapacityKw);
 
     // Animation Loop
     let animationFrameId: number;
@@ -171,11 +170,10 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
     };
     animate();
 
-    // Resize Handler
     const handleResize = () => {
       if (!container || !rendererRef.current || !cameraRef.current) return;
       const w = container.clientWidth;
-      const h = container.clientHeight || 450;
+      const h = container.clientHeight || 460;
       cameraRef.current.aspect = w / h;
       cameraRef.current.updateProjectionMatrix();
       rendererRef.current.setSize(w, h);
@@ -195,16 +193,16 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
   // Update panels orientation when tilt/azimuth/capacity change
   useEffect(() => {
     if (roofPanelsGroupRef.current) {
-      updateRoofPanels(roofPanelsGroupRef.current, panelTiltDeg, panelAzimuthDeg, systemCapacityKw);
+      updateElevatedTerracePanels(roofPanelsGroupRef.current, panelTiltDeg, panelAzimuthDeg, systemCapacityKw);
     }
   }, [panelTiltDeg, panelAzimuthDeg, systemCapacityKw]);
 
-  // Update sun position in 3D scene when hour/month or coordinates change
+  // Update sun position in 3D scene when hour/month changes
   useEffect(() => {
     if (!sunLightRef.current || !sunMeshRef.current) return;
 
     const elevationRad = solarAngles.elevationDeg * (Math.PI / 180);
-    const azimuthRad = (solarAngles.azimuthDeg - 180) * (Math.PI / 180); // Align with coordinate axes
+    const azimuthRad = (solarAngles.azimuthDeg - 180) * (Math.PI / 180);
 
     const sunDistance = 35;
     const isAboveHorizon = solarAngles.elevationDeg > 0;
@@ -217,7 +215,6 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
     sunMeshRef.current.position.set(x, y, z);
 
     if (isAboveHorizon) {
-      // Golden hour warming
       const sunWarmth = Math.sin(elevationRad);
       const intensity = Math.min(3.2, Math.max(0.2, 3.0 * Math.sin(elevationRad)));
       sunLightRef.current.intensity = intensity;
@@ -229,7 +226,7 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
     }
   }, [selectedHour, selectedMonth, latitude, longitude, solarAngles.elevationDeg, solarAngles.azimuthDeg]);
 
-  // Daylight scrubber animation interval
+  // Daylight scrubber animation
   useEffect(() => {
     if (!isPlaying) return;
     const interval = setInterval(() => {
@@ -262,7 +259,7 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
   };
 
   const handleWheel = (e: React.WheelEvent) => {
-    cameraRadiusRef.current = Math.max(10, Math.min(50, cameraRadiusRef.current + e.deltaY * 0.02));
+    cameraRadiusRef.current = Math.max(12, Math.min(50, cameraRadiusRef.current + e.deltaY * 0.02));
     updateCameraPosition();
   };
 
@@ -270,12 +267,12 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
     setCameraView(view);
     if (view === 'iso') {
       cameraThetaRef.current = Math.PI / 4;
-      cameraPhiRef.current = Math.PI / 3.2;
-      cameraRadiusRef.current = 24;
+      cameraPhiRef.current = Math.PI / 3.4;
+      cameraRadiusRef.current = 25;
     } else if (view === 'top') {
       cameraThetaRef.current = 0;
-      cameraPhiRef.current = 0.12;
-      cameraRadiusRef.current = 26;
+      cameraPhiRef.current = 0.08;
+      cameraRadiusRef.current = 24;
     } else if (view === 'front') {
       cameraThetaRef.current = 0;
       cameraPhiRef.current = Math.PI / 2.3;
@@ -284,13 +281,13 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
       const azRad = (solarAngles.azimuthDeg - 180) * (Math.PI / 180);
       cameraThetaRef.current = azRad;
       cameraPhiRef.current = Math.PI / 3;
-      cameraRadiusRef.current = 24;
+      cameraRadiusRef.current = 25;
     }
     updateCameraPosition();
   };
 
   return (
-    <div className="relative flex flex-col bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+    <div className="relative flex flex-col bg-[#0b0f19] border border-[#1e2638] rounded-2xl overflow-hidden shadow-2xl">
       {/* 3D Canvas Viewport */}
       <div
         ref={mountRef}
@@ -301,41 +298,41 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
         onMouseLeave={handleMouseUp}
         onWheel={handleWheel}
       >
-        {/* HUD Top-Left: Realtime Sun & Shadow Analytics */}
+        {/* HUD Top-Left: Solar Elevation & Azimuth */}
         <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
-          <div className="bg-slate-900/85 backdrop-blur-md border border-slate-700/60 rounded-xl px-4 py-2.5 shadow-lg text-xs flex items-center gap-3">
-            <div className={`w-3 h-3 rounded-full ${isSunUp ? 'bg-amber-400 animate-pulse' : 'bg-slate-600'}`} />
+          <div className="bg-[#0f1422]/90 backdrop-blur-md border border-[#1e2638] rounded-xl px-4 py-2.5 shadow-lg text-xs flex items-center gap-3">
+            <div className={`w-2.5 h-2.5 rounded-full ${isSunUp ? 'bg-amber-400' : 'bg-slate-600'}`} />
             <div>
-              <span className="text-slate-400 font-medium">Solar Elevation:</span>{' '}
-              <span className={`font-mono font-bold ${isSunUp ? 'text-amber-300' : 'text-slate-400'}`}>
+              <span className="text-slate-400">Elevation:</span>{' '}
+              <span className={`font-mono font-bold ${isSunUp ? 'text-amber-400' : 'text-slate-400'}`}>
                 {solarAngles.elevationDeg.toFixed(1)}°
               </span>
             </div>
-            <div className="h-4 w-px bg-slate-700" />
+            <div className="h-3.5 w-px bg-slate-700" />
             <div>
-              <span className="text-slate-400 font-medium">Azimuth:</span>{' '}
+              <span className="text-slate-400">Azimuth:</span>{' '}
               <span className="font-mono font-bold text-sky-400">
                 {solarAngles.azimuthDeg.toFixed(1)}°
               </span>
             </div>
           </div>
 
-          {/* Panel Shadow / Direct Sunlight Status Badge */}
-          <div className={`backdrop-blur-md border rounded-xl px-4 py-2 text-xs flex items-center gap-2 shadow-lg transition-all ${
+          {/* Panel Shading Status Badge */}
+          <div className={`backdrop-blur-md border rounded-xl px-3.5 py-1.5 text-xs flex items-center gap-2 shadow-lg transition-all ${
             isIlluminated
-              ? 'bg-emerald-950/70 border-emerald-500/40 text-emerald-300'
-              : 'bg-slate-900/80 border-slate-700/70 text-slate-400'
+              ? 'bg-emerald-950/60 border-emerald-500/30 text-emerald-300'
+              : 'bg-[#0f1422]/90 border-[#1e2638] text-slate-400'
           }`}>
             {isIlluminated ? (
               <>
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span className="font-medium">Direct Sun on Array (Zero Shading)</span>
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="font-medium">Direct Sun on Flat Terrace Array</span>
               </>
             ) : (
               <>
-                <AlertCircle className="w-4 h-4 text-amber-500" />
+                <AlertCircle className="w-3.5 h-3.5 text-amber-500" />
                 <span className="font-medium">
-                  {isSunUp ? 'Self-Shaded / High Incident Angle' : 'Night Time (Sun Below Horizon)'}
+                  {isSunUp ? 'High Incident Angle / Parapet Shade' : 'Night Time (Sun Below Horizon)'}
                 </span>
               </>
             )}
@@ -343,44 +340,43 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
         </div>
 
         {/* HUD Top-Right: Camera Presets */}
-        <div className="absolute top-4 right-4 z-10 flex items-center gap-1.5 bg-slate-900/85 backdrop-blur-md border border-slate-700/60 rounded-xl p-1 shadow-lg">
+        <div className="absolute top-4 right-4 z-10 flex items-center gap-1 bg-[#0f1422]/90 backdrop-blur-md border border-[#1e2638] rounded-xl p-1 shadow-lg">
           {(['iso', 'top', 'front', 'solar'] as const).map((view) => (
             <button
               key={view}
               onClick={() => setViewPreset(view)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                 cameraView === view
-                  ? 'bg-amber-500 text-slate-950 font-bold shadow-md'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                  ? 'bg-amber-500 text-slate-950 font-bold'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
               }`}
             >
               {view === 'iso' && 'Isometric'}
-              {view === 'top' && 'Roof (Top)'}
+              {view === 'top' && 'Terrace (Top)'}
               {view === 'front' && 'Front Elevation'}
               {view === 'solar' && 'Sun Follow'}
             </button>
           ))}
         </div>
 
-        {/* HUD Bottom Center: Drag Instruction Helper */}
-        <div className="absolute bottom-3 left-4 z-10 pointer-events-none text-[11px] text-slate-400 flex items-center gap-2 bg-slate-900/60 px-3 py-1 rounded-full backdrop-blur-sm border border-slate-800">
+        {/* HUD Bottom Center: Navigation Hint */}
+        <div className="absolute bottom-3 left-4 z-10 pointer-events-none text-[11px] text-slate-400 flex items-center gap-2 bg-[#0f1422]/70 px-3 py-1 rounded-full border border-[#1e2638]">
           <Eye className="w-3.5 h-3.5 text-amber-400" />
-          <span>Click & Drag to Orbit Camera • Scroll to Zoom</span>
+          <span>Flat RCC Terrace • Drag to Orbit • Scroll to Zoom</span>
         </div>
       </div>
 
-      {/* Interactive Controls Bar: Time of Day Scrubber & Month Selector */}
-      <div className="bg-slate-950 p-4 border-t border-slate-800 flex flex-col md:flex-row items-center gap-4 justify-between">
-        {/* Play/Pause & Time Slider */}
+      {/* Controls Bar */}
+      <div className="bg-[#080c14] p-4 border-t border-[#1e2638] flex flex-col md:flex-row items-center gap-4 justify-between">
         <div className="flex items-center gap-4 w-full md:w-3/5">
           <button
             onClick={() => setIsPlaying(!isPlaying)}
             className={`p-2.5 rounded-xl border transition-all ${
               isPlaying
-                ? 'bg-amber-500 border-amber-400 text-slate-950'
-                : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-white'
+                ? 'bg-amber-500 border-amber-400 text-slate-950 font-bold'
+                : 'bg-[#121826] hover:bg-slate-800 border-[#1e2638] text-white'
             }`}
-            title={isPlaying ? 'Pause Simulation' : 'Play 24-Hour Cycle'}
+            title={isPlaying ? 'Pause' : 'Play'}
           >
             {isPlaying ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current" />}
           </button>
@@ -388,11 +384,11 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
           <div className="flex-1 flex flex-col gap-1">
             <div className="flex justify-between items-center text-xs">
               <span className="text-slate-400 flex items-center gap-1.5">
-                <Sun className="w-3.5 h-3.5 text-amber-400" /> Time of Day
+                <Sun className="w-3.5 h-3.5 text-amber-400" /> Time of Day (IST)
               </span>
               <span className="font-mono font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">
                 {String(Math.floor(selectedHour)).padStart(2, '0')}:
-                {String(Math.floor((selectedHour % 1) * 60)).padStart(2, '0')}
+                {String(Math.floor((selectedHour % 1) * 60)).padStart(2, '0')} IST
               </span>
             </div>
             <input
@@ -405,32 +401,32 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
                 setSelectedHour(parseFloat(e.target.value));
                 if (isPlaying) setIsPlaying(false);
               }}
-              className="w-full accent-amber-500 cursor-pointer h-2 bg-slate-800 rounded-lg appearance-none"
+              className="w-full accent-amber-500 cursor-pointer h-1.5 bg-slate-800 rounded appearance-none"
             />
           </div>
         </div>
 
-        {/* Month Selector */}
+        {/* Month Selector for Indian Seasons */}
         <div className="flex items-center gap-3 w-full md:w-2/5 justify-end">
-          <span className="text-xs text-slate-400 whitespace-nowrap">Solar Season:</span>
+          <span className="text-xs text-slate-400 whitespace-nowrap">Season:</span>
           <select
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-            className="bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white font-medium focus:outline-none focus:border-amber-500"
+            className="bg-[#121826] border border-[#1e2638] rounded-xl px-3 py-1.5 text-xs text-white font-medium focus:outline-none focus:border-amber-500"
           >
-            <option value={6}>June (Summer Solstice)</option>
-            <option value={3}>March (Spring Equinox)</option>
-            <option value={9}>September (Autumn Equinox)</option>
-            <option value={12}>December (Winter Solstice)</option>
+            <option value={4}>April (Peak Summer / High DNI)</option>
+            <option value={1}>January (Winter Sun / Low Angle)</option>
+            <option value={7}>July (Monsoon / High Diffuse)</option>
+            <option value={10}>October (Post-Monsoon Clear Sky)</option>
           </select>
 
           <button
             onClick={() => {
-              setSelectedHour(13.5);
+              setSelectedHour(12.5);
               setViewPreset('iso');
             }}
-            className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 transition"
-            title="Reset Time & View"
+            className="p-2 bg-[#121826] hover:bg-slate-800 text-slate-300 rounded-xl border border-[#1e2638] transition"
+            title="Reset"
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>
@@ -441,19 +437,19 @@ export const ThreeSolarScene: React.FC<ThreeSolarSceneProps> = ({
 };
 
 // -------------------------------------------------------------
-// Helper Three.js Geometry Builders
+// Helper Three.js Flat Terrace Geometry Builders
 // -------------------------------------------------------------
 
 function addCompassMarkers(scene: THREE.Scene) {
   const directions = [
     { label: 'N', x: 0, z: -14, color: '#ef4444' }, // North
     { label: 'S', x: 0, z: 14, color: '#38bdf8' },  // South
-    { label: 'E', x: 14, z: 0, color: '#94a3b8' },  // East
-    { label: 'W', x: -14, z: 0, color: '#94a3b8' }, // West
+    { label: 'E', x: 14, z: 0, color: '#64748b' },  // East
+    { label: 'W', x: -14, z: 0, color: '#64748b' }, // West
   ];
 
   directions.forEach(({ x, z, color }) => {
-    const markerGeo = new THREE.CylinderGeometry(0.3, 0.3, 0.1, 16);
+    const markerGeo = new THREE.CylinderGeometry(0.3, 0.3, 0.08, 16);
     const markerMat = new THREE.MeshBasicMaterial({ color });
     const marker = new THREE.Mesh(markerGeo, markerMat);
     marker.position.set(x, 0.05, z);
@@ -461,124 +457,184 @@ function addCompassMarkers(scene: THREE.Scene) {
   });
 }
 
-function buildModernHouse(scene: THREE.Scene) {
-  const houseGroup = new THREE.Group();
+/**
+ * Builds a realistic Indian Flat Concrete Terrace Building (No slanting roof)
+ */
+function buildFlatTerraceBuilding(scene: THREE.Scene) {
+  const buildingGroup = new THREE.Group();
 
-  // Main Walls (Modern white stucco)
-  const wallGeo = new THREE.BoxGeometry(10, 4.5, 7.5);
-  const wallMat = new THREE.MeshStandardMaterial({
-    color: '#e2e8f0',
+  const buildingWidth = 11.0;
+  const buildingHeight = 5.0; // Two-storey building
+  const buildingDepth = 8.5;
+
+  // 1. Main Two-Storey Building Body (Clean modern neutral off-white/beige stucco)
+  const bodyGeo = new THREE.BoxGeometry(buildingWidth, buildingHeight, buildingDepth);
+  const bodyMat = new THREE.MeshStandardMaterial({
+    color: '#d1d5db',
+    roughness: 0.65,
+    metalness: 0.05,
+  });
+  const body = new THREE.Mesh(bodyGeo, bodyMat);
+  body.position.y = buildingHeight / 2;
+  body.castShadow = true;
+  body.receiveShadow = true;
+  buildingGroup.add(body);
+
+  // 2. Flat RCC Roof Slab (Floor of the terrace)
+  const terraceSlabGeo = new THREE.BoxGeometry(buildingWidth + 0.4, 0.3, buildingDepth + 0.4);
+  const terraceSlabMat = new THREE.MeshStandardMaterial({
+    color: '#9ca3af',
+    roughness: 0.7,
+  });
+  const terraceSlab = new THREE.Mesh(terraceSlabGeo, terraceSlabMat);
+  terraceSlab.position.y = buildingHeight + 0.15;
+  terraceSlab.receiveShadow = true;
+  buildingGroup.add(terraceSlab);
+
+  // 3. Terrace Parapet Walls (3 ft / ~0.9m perimeter boundary wall)
+  const parapetHeight = 0.9;
+  const parapetThickness = 0.25;
+  const parapetMat = new THREE.MeshStandardMaterial({
+    color: '#e5e7eb',
     roughness: 0.6,
   });
-  const walls = new THREE.Mesh(wallGeo, wallMat);
-  walls.position.y = 2.25;
-  walls.castShadow = true;
-  walls.receiveShadow = true;
-  houseGroup.add(walls);
 
-  // Roof Structure (Gabled base)
-  const roofHeight = 2.2;
-  const roofShape = new THREE.Shape();
-  roofShape.moveTo(-5.2, 0);
-  roofShape.lineTo(0, roofHeight);
-  roofShape.lineTo(5.2, 0);
-  roofShape.closePath();
+  const parapetY = buildingHeight + 0.3 + parapetHeight / 2;
 
-  const extrudeSettings = { depth: 8.0, bevelEnabled: false };
-  const roofGeo = new THREE.ExtrudeGeometry(roofShape, extrudeSettings);
-  const roofMat = new THREE.MeshStandardMaterial({
-    color: '#1e293b',
-    roughness: 0.45,
-  });
-  const roof = new THREE.Mesh(roofGeo, roofMat);
-  roof.rotation.y = Math.PI / 2;
-  roof.position.set(4.0, 4.5, -5.2);
-  roof.castShadow = true;
-  roof.receiveShadow = true;
-  houseGroup.add(roof);
+  // North Parapet (-Z)
+  const northParapetGeo = new THREE.BoxGeometry(buildingWidth + 0.4, parapetHeight, parapetThickness);
+  const northParapet = new THREE.Mesh(northParapetGeo, parapetMat);
+  northParapet.position.set(0, parapetY, -(buildingDepth + 0.4) / 2 + parapetThickness / 2);
+  northParapet.castShadow = true;
+  northParapet.receiveShadow = true;
+  buildingGroup.add(northParapet);
 
-  // Windows (Reflective dark glass)
+  // South Parapet (+Z)
+  const southParapetGeo = new THREE.BoxGeometry(buildingWidth + 0.4, parapetHeight, parapetThickness);
+  const southParapet = new THREE.Mesh(southParapetGeo, parapetMat);
+  southParapet.position.set(0, parapetY, (buildingDepth + 0.4) / 2 - parapetThickness / 2);
+  southParapet.castShadow = true;
+  southParapet.receiveShadow = true;
+  buildingGroup.add(southParapet);
+
+  // West Parapet (-X)
+  const westParapetGeo = new THREE.BoxGeometry(parapetThickness, parapetHeight, buildingDepth);
+  const westParapet = new THREE.Mesh(westParapetGeo, parapetMat);
+  westParapet.position.set(-(buildingWidth + 0.4) / 2 + parapetThickness / 2, parapetY, 0);
+  westParapet.castShadow = true;
+  westParapet.receiveShadow = true;
+  buildingGroup.add(westParapet);
+
+  // East Parapet (+X)
+  const eastParapetGeo = new THREE.BoxGeometry(parapetThickness, parapetHeight, buildingDepth);
+  const eastParapet = new THREE.Mesh(eastParapetGeo, parapetMat);
+  eastParapet.position.set((buildingWidth + 0.4) / 2 - parapetThickness / 2, parapetY, 0);
+  eastParapet.castShadow = true;
+  eastParapet.receiveShadow = true;
+  buildingGroup.add(eastParapet);
+
+  // 4. Rooftop Staircase Headroom (Mumty Room) placed in NW corner
+  const mumtyWidth = 2.6;
+  const mumtyHeight = 2.4;
+  const mumtyDepth = 2.6;
+  const mumtyGeo = new THREE.BoxGeometry(mumtyWidth, mumtyHeight, mumtyDepth);
+  const mumtyMat = new THREE.MeshStandardMaterial({ color: '#f3f4f6', roughness: 0.5 });
+  const mumty = new THREE.Mesh(mumtyGeo, mumtyMat);
+  mumty.position.set(-3.6, buildingHeight + 0.3 + mumtyHeight / 2, -2.6);
+  mumty.castShadow = true;
+  mumty.receiveShadow = true;
+  buildingGroup.add(mumty);
+
+  // Mumty Door
+  const doorGeo = new THREE.BoxGeometry(0.8, 1.8, 0.05);
+  const doorMat = new THREE.MeshStandardMaterial({ color: '#334155', roughness: 0.5 });
+  const door = new THREE.Mesh(doorGeo, doorMat);
+  door.position.set(-3.6, buildingHeight + 0.3 + 0.9, -1.27);
+  buildingGroup.add(door);
+
+  // 5. Overhead Water Tank (Sintex-style black cylinder) on top of Mumty
+  const tankGeo = new THREE.CylinderGeometry(0.7, 0.7, 1.2, 24);
+  const tankMat = new THREE.MeshStandardMaterial({ color: '#1e293b', roughness: 0.3, metalness: 0.2 });
+  const tank = new THREE.Mesh(tankGeo, tankMat);
+  tank.position.set(-3.6, buildingHeight + 0.3 + mumtyHeight + 0.6, -2.6);
+  tank.castShadow = true;
+  buildingGroup.add(tank);
+
+  // 6. Windows on Building Facade
   const glassMat = new THREE.MeshStandardMaterial({
     color: '#0284c7',
     metalness: 0.8,
     roughness: 0.1,
   });
 
-  const frontWindowGeo = new THREE.BoxGeometry(2.5, 1.8, 0.1);
-  const frontWindow = new THREE.Mesh(frontWindowGeo, glassMat);
-  frontWindow.position.set(-2, 2.2, 3.8);
-  houseGroup.add(frontWindow);
+  const winGeo = new THREE.BoxGeometry(2.0, 1.4, 0.1);
+  const win1 = new THREE.Mesh(winGeo, glassMat);
+  win1.position.set(-2.5, 3.2, 4.3);
+  buildingGroup.add(win1);
 
-  const frontDoorGeo = new THREE.BoxGeometry(1.2, 2.4, 0.1);
-  const doorMat = new THREE.MeshStandardMaterial({ color: '#78350f', roughness: 0.7 });
-  const frontDoor = new THREE.Mesh(frontDoorGeo, doorMat);
-  frontDoor.position.set(2, 1.2, 3.8);
-  houseGroup.add(frontDoor);
+  const win2 = new THREE.Mesh(winGeo, glassMat);
+  win2.position.set(2.5, 3.2, 4.3);
+  buildingGroup.add(win2);
 
-  // Chimney Obstruction (Casts dynamic realistic shadow across roof)
-  const chimneyGeo = new THREE.BoxGeometry(0.9, 3.2, 0.9);
-  const chimneyMat = new THREE.MeshStandardMaterial({ color: '#991b1b', roughness: 0.8 });
-  const chimney = new THREE.Mesh(chimneyGeo, chimneyMat);
-  chimney.position.set(-2.5, 5.2, -1.0);
-  chimney.castShadow = true;
-  chimney.receiveShadow = true;
-  houseGroup.add(chimney);
+  const win3 = new THREE.Mesh(winGeo, glassMat);
+  win3.position.set(2.5, 1.2, 4.3);
+  buildingGroup.add(win3);
 
-  // Shading Tree (Nearby obstacle to test real shade)
-  const trunkGeo = new THREE.CylinderGeometry(0.3, 0.4, 4.0, 8);
-  const trunkMat = new THREE.MeshStandardMaterial({ color: '#451a03', roughness: 0.9 });
-  const trunk = new THREE.Mesh(trunkGeo, trunkMat);
-  trunk.position.set(9.0, 2.0, 4.0);
-  trunk.castShadow = true;
-  houseGroup.add(trunk);
+  // Main Entrance Door
+  const mainDoorGeo = new THREE.BoxGeometry(1.4, 2.2, 0.1);
+  const mainDoorMat = new THREE.MeshStandardMaterial({ color: '#78350f', roughness: 0.6 });
+  const mainDoor = new THREE.Mesh(mainDoorGeo, mainDoorMat);
+  mainDoor.position.set(-2.5, 1.1, 4.3);
+  buildingGroup.add(mainDoor);
 
-  const foliageGeo = new THREE.DodecahedronGeometry(2.4, 1);
-  const foliageMat = new THREE.MeshStandardMaterial({ color: '#15803d', roughness: 0.8 });
-  const foliage = new THREE.Mesh(foliageGeo, foliageMat);
-  foliage.position.set(9.0, 5.5, 4.0);
-  foliage.castShadow = true;
-  houseGroup.add(foliage);
-
-  scene.add(houseGroup);
+  scene.add(buildingGroup);
 }
 
-function updateRoofPanels(
+/**
+ * Places the elevated solar array structure on the flat terrace
+ */
+function updateElevatedTerracePanels(
   panelsGroup: THREE.Group,
   tiltDeg: number,
   azimuthDeg: number,
   capacityKw: number
 ) {
-  // Clear previous panels
   while (panelsGroup.children.length > 0) {
     const child = panelsGroup.children[0];
     panelsGroup.remove(child);
   }
 
-  // Calculate panel quantity: typical module ~400W (0.4 kW)
   const panelCount = Math.max(4, Math.min(32, Math.round(capacityKw / 0.4)));
-  const cols = Math.min(8, Math.ceil(Math.sqrt(panelCount * 1.5)));
+  const cols = Math.min(6, Math.ceil(Math.sqrt(panelCount * 1.4)));
   const rows = Math.ceil(panelCount / cols);
 
-  const panelWidth = 1.0;
-  const panelHeight = 1.6;
+  const panelWidth = 1.05;
+  const panelHeight = 1.75;
   const panelDepth = 0.04;
 
   const panelGeo = new THREE.BoxGeometry(panelWidth, panelHeight, panelDepth);
   
-  // Silicon PV cell material with anti-reflective dark blue shine
+  // High-efficiency monocrystalline solar cell look
   const panelMat = new THREE.MeshStandardMaterial({
     color: '#0f172a',
     emissive: '#0369a1',
-    emissiveIntensity: 0.12,
+    emissiveIntensity: 0.1,
     metalness: 0.85,
     roughness: 0.25,
   });
 
-  // Aluminum mounting frame
+  // Anodized Aluminum frame
   const frameMat = new THREE.MeshStandardMaterial({
     color: '#94a3b8',
-    metalness: 0.95,
+    metalness: 0.9,
     roughness: 0.2,
+  });
+
+  // Elevated GI Strut Racking Material
+  const strutMat = new THREE.MeshStandardMaterial({
+    color: '#64748b',
+    metalness: 0.8,
+    roughness: 0.4,
   });
 
   const arrayMount = new THREE.Group();
@@ -589,13 +645,13 @@ function updateRoofPanels(
       if (added >= panelCount) break;
 
       const panel = new THREE.Mesh(panelGeo, panelMat);
-      const posX = (c - cols / 2 + 0.5) * (panelWidth + 0.05);
-      const posY = (r - rows / 2 + 0.5) * (panelHeight + 0.05);
+      const posX = (c - cols / 2 + 0.5) * (panelWidth + 0.06);
+      const posY = (r - rows / 2 + 0.5) * (panelHeight + 0.06);
       panel.position.set(posX, posY, 0.03);
       panel.castShadow = true;
       panel.receiveShadow = true;
 
-      // Add silver border
+      // Frame
       const frameGeo = new THREE.BoxGeometry(panelWidth + 0.03, panelHeight + 0.03, panelDepth * 0.8);
       const frame = new THREE.Mesh(frameGeo, frameMat);
       frame.position.set(posX, posY, 0.01);
@@ -607,18 +663,35 @@ function updateRoofPanels(
     }
   }
 
-  // Place array on roof surface:
-  // Base roof peak is at y = 5.8
-  arrayMount.position.set(0, 5.8, 1.2);
+  // Elevated Terrace Mounting Height:
+  // Terrace slab floor is at y = 5.3
+  // Elevated racking elevates panels ~1.0m above terrace floor so they are at y = 6.4
+  arrayMount.position.set(1.2, 6.4, 0.8);
 
-  // Apply Panel Tilt (around X axis)
+  // Apply Tilt (around X axis)
   const tiltRad = tiltDeg * (Math.PI / 180);
   arrayMount.rotation.x = Math.PI / 2 - tiltRad;
 
-  // Apply Panel Azimuth rotation (around Y axis)
-  // 180° = South (+Z), 0° = North (-Z), 90° = East (+X), 270° = West (-X)
+  // Apply Azimuth rotation (around Y axis)
   const azimuthRad = (azimuthDeg - 180) * (Math.PI / 180);
   arrayMount.rotation.y = azimuthRad;
+
+  // Add 4 vertical GI support stanchions/legs connecting flat terrace floor to the array
+  const legHeight = 1.1;
+  const legGeo = new THREE.CylinderGeometry(0.04, 0.04, legHeight, 8);
+  const legPositions = [
+    [-1.8, 5.3 + legHeight / 2, -0.6],
+    [3.8, 5.3 + legHeight / 2, -0.6],
+    [-1.8, 5.3 + legHeight / 2, 2.0],
+    [3.8, 5.3 + legHeight / 2, 2.0],
+  ];
+
+  legPositions.forEach(([lx, ly, lz]) => {
+    const leg = new THREE.Mesh(legGeo, strutMat);
+    leg.position.set(lx, ly, lz);
+    leg.castShadow = true;
+    panelsGroup.add(leg);
+  });
 
   panelsGroup.add(arrayMount);
 }
