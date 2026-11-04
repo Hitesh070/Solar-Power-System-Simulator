@@ -220,6 +220,6 @@ The repository includes `vercel.json` and is configured for automated CI/CD:
 
 ## Author & License
 
-- **Developer**: Hitesh V S (VIT Chennai)
+- **Developer**: Hitesh V S
 - **GitHub**: [@Hitesh070](https://github.com/Hitesh070)
 - **License**: Released under the [MIT License](LICENSE).
