@@ -134,21 +134,47 @@ flowchart TD
 
 ### Mathematical Modeling & Physics Formulations
 
-1. **Plane of Array (POA) Irradiance (Hay-Davies Model)**:
-   $$POA = I_{\text{beam}} + I_{\text{diffuse}} + I_{\text{ground}}$$
-   $$I_{\text{beam}} = DNI \cdot \max(0, \cos\theta)$$
-   $$I_{\text{diffuse}} = DHI \cdot \left[ A_i \frac{\cos\theta}{\cos\theta_z} + (1 - A_i) \left(\frac{1 + \cos\beta}{2}\right) \right]$$
-   $$I_{\text{ground}} = GHI \cdot \rho \cdot \left(\frac{1 - \cos\beta}{2}\right)$$
-   Where $\theta$ is Angle of Incidence (AOI), $\beta$ is panel tilt, $A_i = \frac{DNI}{1367}$ is the anisotropy index, and $\rho \approx 0.20$ is ground albedo.
+#### 1. Plane of Array (POA) Irradiance (Hay-Davies Model)
+Calculates total irradiance incident on a tilted photovoltaic array by separating beam, diffuse (circumsolar, isotropic, and horizon brightening), and ground-reflected albedo components:
 
-2. **Operating Cell Temperature (Sandia / King Model)**:
-   $$T_{\text{cell}} = T_{\text{amb}} + \left(\frac{POA}{800}\right) \cdot (NOCT - 20) \cdot e^{-0.05 \cdot v_{\text{wind}}}$$
+$$
+POA = I_{\text{beam}} + I_{\text{diffuse}} + I_{\text{ground}}
+$$
 
-3. **PV Power Derating & Temperature Loss**:
-   $$P_{\text{dc}} = P_{\text{rated}} \cdot \left(\frac{POA}{1000}\right) \cdot \left[1 + \gamma \cdot (T_{\text{cell}} - 25^\circ\text{C})\right] \cdot \eta_{\text{derate}}$$
+$$
+I_{\text{beam}} = DNI \cdot \max(0, \cos\theta)
+$$
 
-4. **Levelized Cost of Energy (LCOE in ₹/kWh)**:
-   $$\text{LCOE} = \frac{\text{CAPEX} + \sum_{t=1}^{N} \frac{\text{OPEX}_t + \text{Inverter Replacement}}{(1 + r)^t}}{\sum_{t=1}^{N} \frac{E_t}{(1 + r)^t}}$$
+$$
+I_{\text{diffuse}} = DHI \cdot \left[ A_i \frac{\cos\theta}{\cos\theta_z} + (1 - A_i) \left(\frac{1 + \cos\beta}{2}\right) \right]
+$$
+
+$$
+I_{\text{ground}} = GHI \cdot \rho \cdot \left(\frac{1 - \cos\beta}{2}\right)
+$$
+
+Where $\theta$ is Angle of Incidence (AOI), $\beta$ is panel tilt, $A_i = \frac{DNI}{1367}$ is the anisotropy index, $\theta_z$ is solar zenith angle, and $\rho \approx 0.20$ is ground albedo.
+
+#### 2. Operating Cell Temperature (Sandia / King Model)
+Estimates real-time photovoltaic cell temperature factoring ambient temperature, plane-of-array irradiance, and convective cooling from wind velocity:
+
+$$
+T_{\text{cell}} = T_{\text{amb}} + \left(\frac{POA}{800}\right) \cdot (NOCT - 20) \cdot e^{-0.05 \cdot v_{\text{wind}}}
+$$
+
+#### 3. PV Power Derating & Temperature Loss
+Calculates instantaneous DC electrical output considering standard test conditions ($P_{\text{rated}}$ at $1000\text{ W/m}^2$, $25^\circ\text{C}$), thermal power coefficient ($\gamma$), and system loss factor ($\eta_{\text{derate}}$):
+
+$$
+P_{\text{dc}} = P_{\text{rated}} \cdot \left(\frac{POA}{1000}\right) \cdot \left[1 + \gamma \cdot (T_{\text{cell}} - 25^\circ\text{C})\right] \cdot \eta_{\text{derate}}
+$$
+
+#### 4. Levelized Cost of Energy (LCOE in ₹/kWh)
+Evaluates 25-year lifetime generation cost per kilowatt-hour ($₹/\text{kWh}$) factoring capital expenditure ($\text{CAPEX}$), recurring operational expenses ($\text{OPEX}$), mid-life inverter replacement ($C_{\text{inverter}}$), degradation rate, and discount rate ($r$):
+
+$$
+\text{LCOE} = \frac{\text{CAPEX} + \displaystyle\sum_{t=1}^{N} \frac{\text{OPEX}_t + C_{\text{inverter}}}{(1 + r)^t}}{\displaystyle\sum_{t=1}^{N} \frac{E_t}{(1 + r)^t}}
+$$
 
 ---
 
@@ -294,8 +320,8 @@ HI Grid queries the **Open-Meteo Satellite Solar API**:
 ## 13. Results and Demonstration
 
 The physics engine is validated against analytical benchmarks (`src/test/verify-physics.ts`):
-- **Test 1 (NREL SPA Golden Reference)**: Evaluated at Golden, Colorado ($39.742^\circ\text{N}, -105.179^\circ\text{W}$) against Reda & Andreas (2004) baseline. Zenith and azimuth agree within $\pm 0.4^\circ$.
-- **Test 2 (Tropical Solstice Elevation)**: Evaluated at Bengaluru ($12.972^\circ\text{N}$) verifying high-elevation solar transit.
+- **Test 1 (NREL SPA Golden Reference)**: Evaluated at Golden, Colorado (39.742°N, 105.179°W) against Reda & Andreas (2004) baseline. Zenith and azimuth agree within ±0.4°.
+- **Test 2 (Tropical Solstice Elevation)**: Evaluated at Bengaluru (12.972°N) verifying high-elevation solar transit.
 - **Test 3 (Hay-Davies POA Transposition & ASHRAE IAM)**: Verified decomposition of beam, diffuse, and albedo reflection factors.
 
 ---
