@@ -99,20 +99,20 @@ HI Grid resolves these challenges through a synchronized physics and financial p
 flowchart TD
     subgraph GeoWeather ["Geographical & Meteorological Ingestion"]
         Map["Leaflet GPS Rooftop Locator"]
-        API["Open-Meteo Satellite API\n(Hourly GHI, DNI, DHI, Wind, Temp)"]
+        API["Open-Meteo Satellite API<br/>(Hourly GHI, DNI, DHI, Wind, Temp)"]
     end
 
     subgraph PhysicsCore ["Computational Solar Physics Engine (src/lib/)"]
-        SPA["NREL SPA Algorithm\n(Solar Zenith & Azimuth)"]
-        HayDavies["Hay-Davies POA Model\n(Beam + Circumsolar Diffuse + Albedo)"]
-        Sandia["Sandia Cell Thermal Model\n(Ambient Temp & Wind Velocity)"]
-        Derate["PV Power Derating\n(Temperature Coefficient & Inverter Clip)"]
-        Battery["BESS Storage Dispatch Engine\n(Charge / Discharge Scheduling)"]
-        Finance["Financial & LCOE Solver\n(Discom Net-Metering & Cash Flow)"]
+        SPA["NREL SPA Algorithm<br/>(Solar Zenith &amp; Azimuth)"]
+        HayDavies["Hay-Davies POA Model<br/>(Beam + Circumsolar Diffuse + Albedo)"]
+        Sandia["Sandia Cell Thermal Model<br/>(Ambient Temp &amp; Wind Velocity)"]
+        Derate["PV Power Derating<br/>(Temperature Coefficient &amp; Inverter Clip)"]
+        Battery["BESS Storage Dispatch Engine<br/>(Charge / Discharge Scheduling)"]
+        Finance["Financial &amp; LCOE Solver<br/>(Discom Net-Metering &amp; Cash Flow)"]
     end
 
     subgraph UI ["User Interface & 3D Studio (src/components/)"]
-        Scene3D["Three.js 3D Terrace Studio\n(Dynamic Shadow Raytracer)"]
+        Scene3D["Three.js 3D Terrace Studio<br/>(Dynamic Shadow Raytracer)"]
         Overview["Overview Dashboard (Yield, PR, Savings)"]
         Hourly["8760 Hourly Scrubber Slider"]
         Financials["25-Year Cumulative Cash Flow Tracker"]
@@ -264,20 +264,20 @@ Open `http://localhost:5173` in your web browser.
 
 ```mermaid
 flowchart TD
-    Start([User Inputs City Coordinates / System Capacity]) --> FetchWeather[Fetch Satellite Solar Irradiance: GHI, DNI, DHI, Wind, Temp]
-    FetchWeather --> RunSPA[Execute NREL SPA Algorithm: Compute Zenith θ_z & Azimuth γ_s]
-    RunSPA --> TransposePOA[Apply Hay-Davies POA Transposition Model]
-    TransposePOA --> RaytraceShadows[Three.js 3D Raytracing: Subtract Parapet & Obstacle Shadows]
-    RaytraceShadows --> ComputeCellTemp[Compute Operating Cell Temperature T_cell via Sandia Model]
-    ComputeCellTemp --> ApplyDerating[Compute DC Power: Inverter Clipping & Temperature Derating]
-    ApplyDerating --> DispatchBattery{Battery BESS Enabled?}
+    Start(["User Inputs City Coordinates / System Capacity"]) --> FetchWeather["Fetch Satellite Solar Irradiance: GHI, DNI, DHI, Wind, Temp"]
+    FetchWeather --> RunSPA["Execute NREL SPA Algorithm: Compute Zenith θ_z &amp; Azimuth γ_s"]
+    RunSPA --> TransposePOA["Apply Hay-Davies POA Transposition Model"]
+    TransposePOA --> RaytraceShadows["Three.js 3D Raytracing: Subtract Parapet &amp; Obstacle Shadows"]
+    RaytraceShadows --> ComputeCellTemp["Compute Operating Cell Temperature T_cell via Sandia Model"]
+    ComputeCellTemp --> ApplyDerating["Compute DC Power: Inverter Clipping &amp; Temperature Derating"]
+    ApplyDerating --> DispatchBattery{"Battery BESS Enabled?"}
     
-    DispatchBattery -- Yes --> SimBattery[Simulate Daily Charge / Discharge Cycles]
-    DispatchBattery -- No --> NetMeter[Direct Grid Feed]
+    DispatchBattery -- Yes --> SimBattery["Simulate Daily Charge / Discharge Cycles"]
+    DispatchBattery -- No --> NetMeter["Direct Grid Feed"]
     
     SimBattery --> NetMeter
-    NetMeter --> CalculateFinance[Evaluate Discom Net-Metering Schedule & 25-Year LCOE]
-    CalculateFinance --> RenderUI[Update 3D Canvas, Yield Curves & Financial Tables]
+    NetMeter --> CalculateFinance["Evaluate Discom Net-Metering Schedule &amp; 25-Year LCOE"]
+    CalculateFinance --> RenderUI["Update 3D Canvas, Yield Curves &amp; Financial Tables"]
 ```
 
 ---
